@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +36,12 @@ namespace Chess
         public Panel(int row, int column)
         {
             Coordinates = new Coordinates(row, column);
+        }
+
+        public string ShowPanel()
+        {
+            if (!IsPiece) { return " "; }
+            else { return Piece.Show(); }
         }
     }
 
@@ -125,6 +131,26 @@ namespace Chess
                 }
             }
             return opponentPanels.Distinct().ToList();
+        }
+
+        public string Output()
+        {
+            var output = new StringBuilder();
+            string line = " +-+-+-+-+-+-+-+-+";
+            output.AppendLine(line);
+            for (int r = 0; r<8; r++)
+            {
+                output.Append((8-r).ToString() + "|");
+                for (int c = 0; c<8; c++)
+                {
+                    output.Append(GetPanel(r, c).ShowPanel());
+                    output.Append(|);
+                }
+                output.AppendLine();
+                output.AppendLine(line);
+            }
+            output.Append("  A B C D E F G H");
+            return output.ToString();
         }
     }
 
