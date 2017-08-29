@@ -76,6 +76,11 @@ namespace Chess
             else { throw new InvalidMoveException(); };
             return new Coordinates(row, column);
         }
+
+        public string Display()
+        {
+            return StartCoordinates.Column.ToString() + (8 - StartCoordinates.Row).ToString() + " " + EndCoordinates.Column.ToString() + (8 - EndCoordinates.Row).ToString();
+        }
     }
 
     public class GameBoard
@@ -101,6 +106,7 @@ namespace Chess
 
         public Panel GetPanel(Coordinates coords)
         {
+            if (!coords.Valid) { throw new Exception; }
             Panel pan = Panels.Where(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column)).FirstOrDefault() ?? throw new Exception();
             return pan;
         }
@@ -163,6 +169,7 @@ namespace Chess
 
         public bool IsOpponent(Panel pan)
         {
+            if (!pan.IsPiece) { throw new Exception(); }
             return pan.Piece.Color != Color;
         }
 
