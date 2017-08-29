@@ -63,20 +63,9 @@ namespace Chess
             if (!Int32.TryParse(coords[1].ToString(), out row)) { throw new InvalidMoveException(); };
             row = 8 - row;
             if (!(row >= 0 && row < 8)) { throw new InvalidMoveException(); };
-            /*int row;
-            char rowChar = coords[1];
-                 if rowChar = '8' { column = 0; }
-            else if rowChar = '7' { column = 1; }
-            else if rowChar = '6' { column = 2; }
-            else if rowChar = '5' { column = 3; }
-            else if rowChar = '4' { column = 4; }
-            else if rowChar = '3' { column = 5; }
-            else if rowChar = '2' { column = 6; }
-            else if rowChar = '1' { column = 7; }
-            else { throw new InvalidMoveException(); };*/
             int column;
             char columnChar = coords[0];
-            if (columnChar == 'A') { column = 0; }
+                 if (columnChar == 'A') { column = 0; }
             else if (columnChar == 'B') { column = 1; }
             else if (columnChar == 'C') { column = 2; }
             else if (columnChar == 'D') { column = 3; }
@@ -305,11 +294,17 @@ namespace Chess
             return output;
         }
 
-        //todo: review!!
+        //todo: review - should be ok
         public void Place(Coordinates coords)
         {
             var panel = GameBoard.GetPanel(coords);
             panel.Piece = this;
+        }
+
+        public void Remove(Coordinates coords)
+        {
+            var panel = GameBoard.GetPanel(coords);
+            panel.Piece = null;
         }
 
         public abstract List<Coordinates> GetAvailableMoves();

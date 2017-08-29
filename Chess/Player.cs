@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -10,15 +10,15 @@ namespace Chess
         public string Name { get; set; }
         public Color Color { get; set; }
         public List<Piece> Pieces { get; set; }
-        /*public bool CheckMate
+        public bool CheckMate
         {
             get
             {
                 Piece king = Pieces.Where(x => x.Name == "King").FirstOrDefault();
                 List<Coordinates> moves = king.GetAvailableMoves();
-                return (king as King).IsInCheck && moves.Count() == 0;
+                return (king as King).IsInCheck && moves == null;
             }
-        }*/
+        }
 
 
         public Player(string name, Color color, GameBoard board)
