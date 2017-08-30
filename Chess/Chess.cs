@@ -49,9 +49,11 @@ namespace Chess
     {
         public Coordinates StartCoordinates { get; set; }
         public Coordinates EndCoordinates { get; set; }
+        public GameBoard GameBoard { get; set; }
 
-        public Move(string start, string end)
+        public Move(string start, string end, GameBoard board)
         {
+            GameBoard = board;
             StartCoordinates = ParseCoords(start);
             EndCoordinates = ParseCoords(end);
         }
@@ -80,6 +82,25 @@ namespace Chess
         public string Display()
         {
             return StartCoordinates.Column.ToString() + (8 - StartCoordinates.Row).ToString() + " " + EndCoordinates.Column.ToString() + (8 - EndCoordinates.Row).ToString();
+        }
+        
+        public bool IsValid()
+        {
+            if (!GameBoard.GetPanel(StartCoordinates).IsPiece) { return false; }
+            else
+            {
+                var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
+                var moves = startPiece.GetAvailableMoves();
+                return StartCoordinates.Valid && EndCoordinates.Valid && moves.Contains(EndCoordinates);
+            }
+        }
+        
+        public void Make()
+        {
+            if (!IsValid()) { throw new InvalidMoveException(); }
+            var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
+            if 
+            if (startPiece.Name == "King") { }
         }
     }
 
