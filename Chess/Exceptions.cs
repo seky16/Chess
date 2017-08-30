@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Chess
 {
-    [Serializable]
+    //[Serializable]
     public class InvalidMoveException : Exception
     {
         public InvalidMoveException()

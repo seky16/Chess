@@ -41,7 +41,7 @@ namespace Chess
         public string ShowPanel()
         {
             if (!IsPiece) { return " "; }
-            else { return Piece.Show(); }
+            else { return Piece.Show().ToString(); }
         }
     }
 
@@ -50,10 +50,12 @@ namespace Chess
         public Coordinates StartCoordinates { get; set; }
         public Coordinates EndCoordinates { get; set; }
         public GameBoard GameBoard { get; set; }
+        public Player Player { get; set; }
 
-        public Move(string start, string end, GameBoard board)
+        public Move(string start, string end, Player player)
         {
-            GameBoard = board;
+            Player = player;
+            GameBoard = Player.GameBoard;
             StartCoordinates = ParseCoords(start);
             EndCoordinates = ParseCoords(end);
         }
@@ -61,12 +63,12 @@ namespace Chess
         private Coordinates ParseCoords(string coords)
         {
             if (coords.Length != 2) { throw new InvalidMoveException(); }
-            int row;
+            int row = -1;
             if (!Int32.TryParse(coords[1].ToString(), out row)) { throw new InvalidMoveException(); };
             row = 8 - row;
             if (!(row >= 0 && row < 8)) { throw new InvalidMoveException(); };
             int column;
-            char columnChar = coords[0];
+            char columnChar = coords.ToUpper()[0];
                  if (columnChar == 'A') { column = 0; }
             else if (columnChar == 'B') { column = 1; }
             else if (columnChar == 'C') { column = 2; }
@@ -83,24 +85,26 @@ namespace Chess
         {
             return StartCoordinates.Column.ToString() + (8 - StartCoordinates.Row).ToString() + " " + EndCoordinates.Column.ToString() + (8 - EndCoordinates.Row).ToString();
         }
-        
+
         public bool IsValid()
         {
             if (!GameBoard.GetPanel(StartCoordinates).IsPiece) { return false; }
             else
             {
                 var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
+                if (!Player.Pieces.Contains(startPiece)) { return false; }
                 var moves = startPiece.GetAvailableMoves();
                 return StartCoordinates.Valid && EndCoordinates.Valid && moves.Contains(EndCoordinates);
             }
         }
-        
+
         public void Make()
         {
             if (!IsValid()) { throw new InvalidMoveException(); }
             var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
-            if 
-            if (startPiece.Name == "King") { }
+            if ((Player.Pieces.FirstOrDefault(p => p.Name == "King") as King).IsInCheck && startPiece.Name != "King") { throw new InvalidMoveException("King is in check! You have to defend him!"); }
+            startPiece.Remove(StartCoordinates);
+            startPiece.Place(EndCoordinates);
         }
     }
 
@@ -127,8 +131,8 @@ namespace Chess
 
         public Panel GetPanel(Coordinates coords)
         {
-            if (!coords.Valid) { throw new Exception; }
-            Panel pan = Panels.Where(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column)).FirstOrDefault() ?? throw new Exception();
+            //if (!coords.Valid) { return null; }// throw new Exception(); }
+            Panel pan = Panels.Where(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column)).FirstOrDefault();// ?? throw new Exception();
             return pan;
         }
 
@@ -160,7 +164,7 @@ namespace Chess
                 for (int c = 0; c<8; c++)
                 {
                     output.Append(GetPanel(r, c).ShowPanel());
-                    output.Append(|);
+                    output.Append("|");
                 }
                 output.AppendLine();
                 output.AppendLine(line);
@@ -190,7 +194,7 @@ namespace Chess
 
         public bool IsOpponent(Panel pan)
         {
-            if (!pan.IsPiece) { throw new Exception(); }
+            if (!pan.IsPiece) { return false; }
             return pan.Piece.Color != Color;
         }
 
