@@ -5,7 +5,6 @@ using System.Text;
 
 namespace Chess
 {
-    public enum Col { A = 0, B, C, D, E, F, G, H }
     public enum Color { White, Black }
 
     public class Coordinates
@@ -88,6 +87,7 @@ namespace Chess
 
         public bool IsValid()
         {
+            if (GameBoard.GetPanel(StartCoordinates) == null) { return false; }
             if (!GameBoard.GetPanel(StartCoordinates).IsPiece) { return false; }
             else
             {
@@ -131,8 +131,8 @@ namespace Chess
 
         public Panel GetPanel(Coordinates coords)
         {
-            //if (!coords.Valid) { return null; }// throw new Exception(); }
-            Panel pan = Panels.Where(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column)).FirstOrDefault();// ?? throw new Exception();
+            if (!coords.Valid) { return null; }// throw new Exception(); }
+            Panel pan = Panels.Where(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column))?.FirstOrDefault();// ?? throw new Exception();
             return pan;
         }
 
@@ -141,7 +141,7 @@ namespace Chess
             var opponentPanels = new List<Panel>();
             foreach (var pan in Panels)
             {
-                if (pan.IsPiece && pan.Piece.IsOpponent(panelOpponent))
+                if (pan.IsPiece && (pan.Piece?.IsOpponent(panelOpponent) ?? false))
                 {
                     List<Coordinates> pieceMoves = pan.Piece.GetAvailableMoves();
                     foreach (var coords in pieceMoves)
