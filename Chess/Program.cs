@@ -6,9 +6,10 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            var board = new GameBoard();
-            var player1 = new Player("Player1", Color.White, board);
-            var player2 = new Player("Player2", Color.Black, board);
+            var game = new Game("Player1", "Player2");
+            var board = game.GameBoard;
+            var player1 = game.Player1;
+            var player2 = game.Player2;
             Console.WriteLine(board.Output());
             while (true)
             {

@@ -23,6 +23,8 @@ namespace Chess
             }
         }
         public GameBoard GameBoard { get; set; }
+        public Game Game { get; set; }
+        public Player Opponent => Game.GetOpponent(this);
         /*public bool CheckMate
         {
             get
@@ -34,11 +36,12 @@ namespace Chess
         }*/
 
 
-        public Player(string name, Color color, GameBoard board)
+        public Player(string name, Color color, Game game)
         {
+            Game = game;
             Name = name;
             Color = color;
-            GameBoard = board;
+            GameBoard = game.GameBoard;
             PlacePieces();
         }
 
