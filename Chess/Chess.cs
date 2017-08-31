@@ -82,19 +82,43 @@ namespace Chess
 
         public string Display()
         {
-            return StartCoordinates.Column.ToString() + (8 - StartCoordinates.Row).ToString() + " " + EndCoordinates.Column.ToString() + (8 - EndCoordinates.Row).ToString();
+            string output = String.Empty;
+                 if (StartCoordinates.Column == 0) { output += "A"; }
+            else if (StartCoordinates.Column == 1) { output += "B"; }
+            else if (StartCoordinates.Column == 2) { output += "C"; }
+            else if (StartCoordinates.Column == 3) { output += "D"; }
+            else if (StartCoordinates.Column == 4) { output += "E"; }
+            else if (StartCoordinates.Column == 5) { output += "F"; }
+            else if (StartCoordinates.Column == 6) { output += "G"; }
+            else if (StartCoordinates.Column == 7) { output += "H"; }
+            output += (8 - StartCoordinates.Row).ToString() + " -> ";
+                 if (EndCoordinates.Column == 0) { output += "A"; }
+            else if (EndCoordinates.Column == 1) { output += "B"; }
+            else if (EndCoordinates.Column == 2) { output += "C"; }
+            else if (EndCoordinates.Column == 3) { output += "D"; }
+            else if (EndCoordinates.Column == 4) { output += "E"; }
+            else if (EndCoordinates.Column == 5) { output += "F"; }
+            else if (EndCoordinates.Column == 6) { output += "G"; }
+            else if (EndCoordinates.Column == 7) { output += "H"; }
+            output += (8 - EndCoordinates.Row).ToString();
+            return output;
         }
 
         public bool IsValid()
         {
             if (GameBoard.GetPanel(StartCoordinates) == null) { return false; }
-            if (!GameBoard.GetPanel(StartCoordinates).IsPiece) { return false; }
+            if (!GameBoard.GetPanel(StartCoordinates)?.IsPiece ?? false) { return false; }
             else
             {
                 var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
                 if (!Player.Pieces.Contains(startPiece)) { return false; }
                 var moves = startPiece.GetAvailableMoves();
-                return StartCoordinates.Valid && EndCoordinates.Valid && moves.Contains(EndCoordinates);
+                bool endCoordsCheck = false;
+                foreach (var coords in moves)
+                {
+                    if (coords.Row == EndCoordinates.Row && coords.Column == EndCoordinates.Column) { endCoordsCheck = true; break; }
+                }
+                return StartCoordinates.Valid && EndCoordinates.Valid && endCoordsCheck;
             }
         }
 
@@ -102,7 +126,7 @@ namespace Chess
         {
             if (!IsValid()) { throw new InvalidMoveException(); }
             var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
-            if ((Player.Pieces.FirstOrDefault(p => p.Name == "King") as King).IsInCheck && startPiece.Name != "King") { throw new InvalidMoveException("King is in check! You have to defend him!"); }
+            //if ((Player.Pieces.FirstOrDefault(p => p.Name == "King") as King).IsInCheck && startPiece.Name != "King") { throw new InvalidMoveException("King is in check! You have to defend him!"); }
             startPiece.Remove(StartCoordinates);
             startPiece.Place(EndCoordinates);
         }
@@ -132,7 +156,7 @@ namespace Chess
         public Panel GetPanel(Coordinates coords)
         {
             if (!coords.Valid) { return null; }// throw new Exception(); }
-            Panel pan = Panels.Where(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column))?.FirstOrDefault();// ?? throw new Exception();
+            Panel pan = Panels.Where(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column))?.FirstOrDefault() ?? throw new Exception();
             return pan;
         }
 
@@ -194,7 +218,7 @@ namespace Chess
 
         public bool IsOpponent(Panel pan)
         {
-            if (!pan.IsPiece) { return false; }
+            if ((!pan?.IsPiece) ?? false) { return false; }
             return pan.Piece.Color != Color;
         }
 
@@ -213,7 +237,7 @@ namespace Chess
             {
                 int r = coords.Row - i;
                 Panel pan = board.GetPanel(r, coords.Column);
-                if (pan.Coordinates.Valid)
+                if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
                     else if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
@@ -225,7 +249,7 @@ namespace Chess
             {
                 int r = coords.Row + i;
                 Panel pan = board.GetPanel(r, coords.Column);
-                if (pan.Coordinates.Valid)
+                if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
                     else if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
@@ -237,7 +261,7 @@ namespace Chess
             {
                 int c = coords.Column - i;
                 Panel pan = board.GetPanel(coords.Row, c);
-                if (pan.Coordinates.Valid)
+                if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
                     else if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
@@ -249,7 +273,7 @@ namespace Chess
             {
                 int c = coords.Column + i;
                 Panel pan = board.GetPanel(coords.Row, c);
-                if (pan.Coordinates.Valid)
+                if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
                     else if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
@@ -276,7 +300,7 @@ namespace Chess
                 int r = coords.Row - i;
                 int c = coords.Column - i;
                 Panel pan = board.GetPanel(r, c);
-                if (pan.Coordinates.Valid)
+                if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
                     else if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
@@ -289,7 +313,7 @@ namespace Chess
                 int r = coords.Row - i;
                 int c = coords.Column + i;
                 Panel pan = board.GetPanel(r, c);
-                if (pan.Coordinates.Valid)
+                if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
                     else if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
@@ -302,7 +326,7 @@ namespace Chess
                 int r = coords.Row + i;
                 int c = coords.Column + i;
                 Panel pan = board.GetPanel(r, c);
-                if (pan.Coordinates.Valid)
+                if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
                     else if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
@@ -315,7 +339,7 @@ namespace Chess
                 int r = coords.Row + i;
                 int c = coords.Column - i;
                 Panel pan = board.GetPanel(r, c);
-                if (pan.Coordinates.Valid)
+                if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
                     else if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
@@ -331,6 +355,7 @@ namespace Chess
         {
             var panel = GameBoard.GetPanel(coords);
             panel.Piece = this;
+            Coordinates = panel.Coordinates;
         }
 
         public void Remove(Coordinates coords)
@@ -415,21 +440,21 @@ namespace Chess
             var c = Coordinates.Column;
             var output = new List<Coordinates>();
             var possible = new List<Coordinates>()
-        {
-            board.GetPanel(r - 2, c + 1).Coordinates,
-            board.GetPanel(r - 1, c + 2).Coordinates,
-            board.GetPanel(r + 1, c + 2).Coordinates,
-            board.GetPanel(r + 2, c + 1).Coordinates,
-            board.GetPanel(r + 2, c - 1).Coordinates,
-            board.GetPanel(r + 1, c - 2).Coordinates,
-            board.GetPanel(r - 1, c - 2).Coordinates,
-            board.GetPanel(r - 2, c - 1).Coordinates
-        };
+            {
+                board.GetPanel(r - 2, c + 1)?.Coordinates,
+                board.GetPanel(r - 1, c + 2)?.Coordinates,
+                board.GetPanel(r + 1, c + 2)?.Coordinates,
+                board.GetPanel(r + 2, c + 1)?.Coordinates,
+                board.GetPanel(r + 2, c - 1)?.Coordinates,
+                board.GetPanel(r + 1, c - 2)?.Coordinates,
+                board.GetPanel(r - 1, c - 2)?.Coordinates,
+                board.GetPanel(r - 2, c - 1)?.Coordinates
+            };
 
 
             foreach (var coords in possible)
             {
-                if (coords.Valid)
+                if (coords?.Valid ?? false)
                 {
                     var pan = board.GetPanel(coords);
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); }
@@ -458,20 +483,30 @@ namespace Chess
             if (Color == Color.White)
             {
                 var up = GameBoard.GetPanel(Coordinates.Row - 1, Coordinates.Column);
-                if (up.Coordinates.Valid && !up.IsPiece) { output.Add(up.Coordinates); }
+                if ((up?.Coordinates?.Valid ?? false) && ((!up?.IsPiece) ?? false)) { output.Add(up.Coordinates); }
                 var upL = GameBoard.GetPanel(Coordinates.Row - 1, Coordinates.Column - 1);
-                if (upL.Coordinates.Valid && IsOpponent(upL)) { output.Add(upL.Coordinates); }
+                if ((upL?.Coordinates?.Valid ?? false) && IsOpponent(upL)) { output.Add(upL.Coordinates); }
                 var upR = GameBoard.GetPanel(Coordinates.Row - 1, Coordinates.Column + 1);
-                if (upR.Coordinates.Valid && IsOpponent(upR)) { output.Add(upR.Coordinates); }
+                if ((upR?.Coordinates?.Valid ?? false) && IsOpponent(upR)) { output.Add(upR.Coordinates); }
+                if (Coordinates.Row == 6)
+                {
+                    var up2 = GameBoard.GetPanel(Coordinates.Row - 2, Coordinates.Column);
+                    if (up2.Coordinates.Valid && !up2.IsPiece) { output.Add(up2.Coordinates); }
+                }
             }
             else
             {
                 var down = GameBoard.GetPanel(Coordinates.Row + 1, Coordinates.Column);
-                if (down.Coordinates.Valid && !down.IsPiece) { output.Add(down.Coordinates); }
+                if ((down?.Coordinates?.Valid ?? false) && ((!down?.IsPiece) ?? false)) { output.Add(down.Coordinates); }
                 var downL = GameBoard.GetPanel(Coordinates.Row + 1, Coordinates.Column - 1);
-                if (downL.Coordinates.Valid && IsOpponent(downL)) { output.Add(downL.Coordinates); }
+                if ((downL?.Coordinates?.Valid ?? false) && IsOpponent(downL)) { output.Add(downL.Coordinates); }
                 var downR = GameBoard.GetPanel(Coordinates.Row + 1, Coordinates.Column + 1);
-                if (downR.Coordinates.Valid && IsOpponent(downR)) { output.Add(downR.Coordinates); }
+                if ((downR?.Coordinates?.Valid ?? false) && IsOpponent(downR)) { output.Add(downR.Coordinates); }
+                if (Coordinates.Row == 1)
+                {
+                    var down2 = GameBoard.GetPanel(Coordinates.Row + 2, Coordinates.Column);
+                    if (down2.Coordinates.Valid && !down2.IsPiece) { output.Add(down2.Coordinates); }
+                }
             }
             //en passant?
             return output;

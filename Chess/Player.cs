@@ -9,9 +9,21 @@ namespace Chess
     {
         public string Name { get; set; }
         public Color Color { get; set; }
-        public List<Piece> Pieces { get; set; }
+        public List<Piece> Pieces { get
+            {
+                var output = new List<Piece>();
+                foreach (var pan in GameBoard.Panels)
+                {
+                    if (pan.IsPiece)
+                    {
+                        if (pan.Piece.Color == Color) { output.Add(pan.Piece); }
+                    }
+                }
+                return output;
+            }
+        }
         public GameBoard GameBoard { get; set; }
-        public bool CheckMate
+        /*public bool CheckMate
         {
             get
             {
@@ -19,7 +31,7 @@ namespace Chess
                 List<Coordinates> moves = king.GetAvailableMoves();
                 return (king as King).IsInCheck && moves == null;
             }
-        }
+        }*/
 
 
         public Player(string name, Color color, GameBoard board)
@@ -78,7 +90,6 @@ namespace Chess
                     new Pawn(GameBoard, new Coordinates(1, 7), Color)
                 };
             }
-            Pieces = pieces;
         }
     }
 }
