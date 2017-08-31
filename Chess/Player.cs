@@ -25,16 +25,49 @@ namespace Chess
         public GameBoard GameBoard { get; set; }
         public Game Game { get; set; }
         public Player Opponent => Game.GetOpponent(this);
-        /*public bool CheckMate
+        public King King =>
         {
-            get
+            foreach (var p in Pieces)
             {
-                Piece king = Pieces.Where(x => x.Name == "King").FirstOrDefault();
-                List<Coordinates> moves = king.GetAvailableMoves();
-                return (king as King).IsInCheck && moves == null;
+                if (p.Name == "King") { return p as King; }
             }
-        }*/
-
+        }
+        public bool CheckMate =>
+        {
+            List<Coordinates> moves = King.AvailableMoves;
+            return King.IsInCheck && (moves?.Count() ?? 0) == 0);
+        }
+        public int BaseRow => 
+        {
+            if (Color == Color.White) { return 7; }
+            else if (Color == Color.Black) { return 0; }
+            else { return -1; }
+        }
+        public bool KingMoved { get; set; }
+        public bool LeftRookMoved { get; set; }
+        public bool RightRookMoved { get; set; }
+        public bool CanLeftCastle =>
+        {
+            if (KingMoved) { return false; }
+            if (LeftRookMoved) { return false; }
+            var p1 = GameBoard.GetPanel(BaseRow, 1);
+            var p2 = GameBoard.GetPanel(BaseRow, 2);
+            if (p1.IsPiece || p2.IsPiece) { return false; }
+            var opponentMoves = GameBoard.GetOpponentPanels();
+            if (opponentMoves.Contains(p1) || opponentMoved.Contains(p2)) { return false; }
+            return true;
+        }
+        public bool CanRightCastle =>
+        {
+            if (KingMoved) { return false; }
+            if (RightRookMoved) { return false; }
+            var p1 = GameBoard.GetPanel(BaseRow, 5);
+            var p2 = GameBoard.GetPanel(BaseRow, 6);
+            if (p1.IsPiece || p2.IsPiece) { return false; }
+            var opponentMoves = GameBoard.GetOpponentPanels();
+            if (opponentMoves.Contains(p1) || opponentMoved.Contains(p2)) { return false; }
+            return true;
+        }
 
         public Player(string name, Color color, Game game)
         {
@@ -42,7 +75,9 @@ namespace Chess
             Name = name;
             Color = color;
             GameBoard = game.GameBoard;
-            PlacePieces();
+            KingMoved = false;
+            LeftRookMoved = false;
+            RightRookMoved = false;
         }
 
         public void PlacePieces()

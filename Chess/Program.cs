@@ -11,7 +11,7 @@ namespace Chess
             var player1 = game.Player1;
             var player2 = game.Player2;
             Console.WriteLine(board.Output());
-            while (true)
+            while (!Player1.CheckMate)
             {
                 Console.Write($"{player1.Name}: ");
                 string input1 = Console.ReadLine();
@@ -20,16 +20,19 @@ namespace Chess
                 player1Move.Make();
                 Console.Clear();
                 Console.WriteLine(board.Output());
-                Console.WriteLine($"Player1: {player1Move.Display()}");
+                Console.WriteLine($"{player1.Name}: {player1Move.Display()}");
 
-                Console.Write($"{player2.Name}: ");
-                string input3 = Console.ReadLine();
-                string input4 = Console.ReadLine();
-                var player2Move = new Move(input3, input4, player2);
-                player2Move.Make();
-                Console.Clear();
-                Console.WriteLine(board.Output());
-                Console.WriteLine($"Player2: {player2Move.Display()}");
+                if (!player2.CheckMate)
+                {
+                    Console.Write($"{player2.Name}: ");
+                    string input3 = Console.ReadLine();
+                    string input4 = Console.ReadLine();
+                    var player2Move = new Move(input3, input4, player2);
+                    player2Move.Make();
+                    Console.Clear();
+                    Console.WriteLine(board.Output());
+                    Console.WriteLine($"{player2.Name}: {player2Move.Display()}");
+                }
             }
         }
     }

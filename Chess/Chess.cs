@@ -129,15 +129,39 @@ namespace Chess
             //if ((Player.Pieces.FirstOrDefault(p => p.Name == "King") as King).IsInCheck && startPiece.Name != "King") { throw new InvalidMoveException("King is in check! You have to defend him!"); }
             startPiece.Remove(StartCoordinates);
             startPiece.Place(EndCoordinates);
+            if (startPiece.Name == "King" && StartCoordinates.Column == 4; ) { Player.KingMoved = true; }
+            if (startPiece.Name == "Rook")
+            {
+                if (StartCoordinates.Column == 0) { Player.LeftRookMoved = true; }
+                else if (StartCoordinates.Column == 7) { Player.RightRookMoved = true; }
+            }
+
+            if (startPiece.Name == "King" && StartCoordinates.Column == 4 && EndCoordinates.Column == 2)
+            {
+                var p = GameBoard.GetPanel(Player.BaseRow, 0);
+                var rook = p?.Piece;
+                rook.Remove(p.Coordinates);
+                rook.Place(GameBoard.GetPanel(Player.BaseRow, 3);
+            }
+
+            if (startPiece.Name == "King" && StartCoordinates.Column == 4 && EndCoordinates.Column == 6)
+            {
+                var p = GameBoard.GetPanel(Player.BaseRow, 7);
+                var rook = p?.Piece;
+                rook.Remove(p.Coordinates);
+                rook.Place(GameBoard.GetPanel(Player.BaseRow, 5);
+            }
         }
     }
 
     public class GameBoard
     {
         public List<Panel> Panels { get; set; }
+        public Game Game { get; set; }
 
-        public GameBoard()
+        public GameBoard(Game game)
         {
+            Game = game;
             Panels = new List<Panel>();
             for (int i = 0; i < 8; i++)
             {

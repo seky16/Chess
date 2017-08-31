@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,9 +12,11 @@ namespace Chess
 
         public Game(string player1Name, string player2Name)
         {
-            GameBoard = new GameBoard();
+            GameBoard = new GameBoard(this);
             Player1 = new Player(player1Name, Color.White, this);
             Player2 = new Player(player2Name, Color.Black, this);
+            Player1.PlacePieces();
+            Player2.PlacePieces();
         }
 
         public Player GetOpponent(Player thisPlayer)
@@ -24,6 +26,6 @@ namespace Chess
             else { throw new Exception("Game is not set properly!"); }
         }
 
-
+        
     }
 }

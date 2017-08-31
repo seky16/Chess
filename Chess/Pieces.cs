@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -157,7 +157,6 @@ namespace Chess
             return output;
         }
 
-        //todo: review - should be ok
         public void Place(Coordinates coords)
         {
             var panel = GameBoard.GetPanel(coords);
@@ -325,6 +324,7 @@ namespace Chess
 
     public class King : Piece
     {
+        public Player Player { get; set; }
         public King(GameBoard board, Coordinates coords, Color color)
         {
             GameBoard = board;
@@ -332,6 +332,8 @@ namespace Chess
             Coordinates = coords;
             Name = "King";
             Character = 'K';
+            if (board.Game.Player1.Color == color) { Player = Player1; }
+            else if (board.Game.Player2.Color == color) { Player = Player2; }
             Place(coords);
         }
 
@@ -348,6 +350,8 @@ namespace Chess
                     if (!opponentPanels.Contains(pan)) { output.Add(pan.Coordinates); }
                 }
             }
+            if (Player.CanLeftCastle) { output.Add(GameBoard.GetPanel(Player.BaseRow, 2).Coordinates); }
+            if (Player.CanRightCastle) { output.Add(GameBoard.GetPanel(Player.BaseRow, 6).Coordinates); }
             return output;
         }
 
