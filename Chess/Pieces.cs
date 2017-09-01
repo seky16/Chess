@@ -181,17 +181,23 @@ namespace Chess
             return output;
         }
 
-        public void Place(Coordinates coords)
+        private void Place(Coordinates coords)
         {
             var panel = GameBoard.GetPanel(coords);
             panel.Piece = this;
             Coordinates = panel.Coordinates;
         }
 
-        public void Remove(Coordinates coords)
+        private void Remove()
         {
-            var panel = GameBoard.GetPanel(coords);
+            var panel = GameBoard.GetPanel(Coordinates);
             panel.Piece = null;
+        }
+
+        public void MoveTo(Coordinates coords)
+        {
+            Remove();
+            Place(coords);
         }
 
         public abstract List<Coordinates> GetAvailableMoves();

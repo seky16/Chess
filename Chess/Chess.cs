@@ -106,18 +106,18 @@ namespace Chess
 
         public bool IsValid()
         {
-            if (GameBoard.GetPanel(StartCoordinates) == null) { return false; }
             if (!GameBoard.GetPanel(StartCoordinates)?.IsPiece ?? false) { return false; }
             else
             {
                 var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
                 if (!Player.Pieces.Contains(startPiece)) { return false; }
                 var moves = startPiece.GetAvailableMoves();
-                bool endCoordsCheck = false;
+                /*bool endCoordsCheck = false;
                 foreach (var coords in moves)
                 {
                     if (coords.Row == EndCoordinates.Row && coords.Column == EndCoordinates.Column) { endCoordsCheck = true; break; }
-                }
+                }*/
+                bool endCoordsCheck = moves.Any(c => c.Row == EndCoordinates.Row && c.Column == EndCoordinates.Column);
                 return StartCoordinates.Valid && EndCoordinates.Valid && endCoordsCheck;
             }
         }
@@ -127,29 +127,29 @@ namespace Chess
             if (!IsValid()) { throw new InvalidMoveException(); }
             var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
             //if ((Player.King.IsInCheck && startPiece.Name != "King") { throw new InvalidMoveException("King is in check! You have to defend him!"); }
-            startPiece.Remove(StartCoordinates);
-            startPiece.Place(EndCoordinates);
+            startPiece.MoveTo(EndCoordinates);
+
+            // checks for castling
             if (startPiece.Name == "King" && StartCoordinates.Column == 4) { Player.KingMoved = true; }
             if (startPiece.Name == "Rook")
             {
-                if (StartCoordinates.Column == 0) { Player.LeftRookMoved = true; }
-                else if (StartCoordinates.Column == 7) { Player.RightRookMoved = true; }
+                if (StartCoordinates.Column == 0 && StartCoordinates.Row == Player.BaseRow) { Player.LeftRookMoved = true; }
+                else if (StartCoordinates.Column == 7 && StartCoordinates.Row == Player.BaseRow) { Player.RightRookMoved = true; }
             }
 
-            if (startPiece.Name == "King" && StartCoordinates.Column == 4 && EndCoordinates.Column == 2)
+            // castling
+            if (startPiece.Name == "King" && StartCoordinates.Column == 4 && EndCoordinates.Column == 2 && StartCoordinates.Row == Player.BaseRow && EndCoordinates.Row == Player.BaseRow)
             {
                 var p = GameBoard.GetPanel(Player.BaseRow, 0);
-                var rook = p?.Piece;
-                rook.Remove(p.Coordinates);
-                rook.Place(GameBoard.GetPanel(Player.BaseRow, 3).Coordinates);
+                var rook = p?.Piece ?? throw new InvalidMoveException();
+                rook.MoveTo(GameBoard.GetPanel(Player.BaseRow, 3).Coordinates);
             }
 
-            if (startPiece.Name == "King" && StartCoordinates.Column == 4 && EndCoordinates.Column == 6)
+            if (startPiece.Name == "King" && StartCoordinates.Column == 4 && EndCoordinates.Column == 6 && StartCoordinates.Row == Player.BaseRow && EndCoordinates.Row == Player.BaseRow)
             {
                 var p = GameBoard.GetPanel(Player.BaseRow, 7);
-                var rook = p?.Piece;
-                rook.Remove(p.Coordinates);
-                rook.Place(GameBoard.GetPanel(Player.BaseRow, 5).Coordinates);
+                var rook = p?.Piece ?? throw new InvalidMoveException();
+                rook.MoveTo(GameBoard.GetPanel(Player.BaseRow, 5).Coordinates);
             }
         }
     }
