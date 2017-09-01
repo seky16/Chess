@@ -179,13 +179,13 @@ namespace Chess
 
         public Panel GetPanel(Coordinates coords)
         {
-            if (!coords.Valid) { return null; }// throw new Exception(); }
-                                               //Panel pan = Panels.FirstOrDefault(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column));
-            Panel pan = null;
+            if (!coords.Valid) { return null; }
+            Panel pan = Panels.FirstOrDefault(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column));
+            /*Panel pan = null;
             foreach (var p in Panels)
             {
                 if (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column) { pan = p; break; }
-            }
+            }*/
             return pan;
         }
 

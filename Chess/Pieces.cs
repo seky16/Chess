@@ -9,10 +9,16 @@ namespace Chess
     {
         public string Name { get; set; }
         public Coordinates Coordinates { get; set; }
-        //public List<Coordinates> AvailableMoves { get { return GetAvailableMoves(); } }
         public Color Color { get; set; }
-        protected char Character { get; set; }
+        private char Character { get; set; }
         public GameBoard GameBoard { get; set; }
+        public Player Player { get; private set; }
+
+        protected void SetPlayer()
+        {
+            if (GameBoard.Game.Player1.Color == Color) { Player = GameBoard.Game.Player1; }
+            else if (GameBoard.Game.Player2.Color == Color) { Player = GameBoard.Game.Player2; }
+        }
 
         public char Show()
         {
@@ -27,6 +33,21 @@ namespace Chess
         {
             if ((!pan?.IsPiece) ?? false) { return false; }
             return pan.Piece.Color != Color;
+        }
+
+        public List<Panel> GetOpponentPanels()
+        {
+            var opponentPanels = new List<Panel>();
+            foreach (var piece in Player.Opponent.Pieces)
+            {
+                if (piece.Name == "King") { List<Coordinates> pieceMoves = piece.Cross(1).Concat(piece.Diagonal(1)).ToList(); }
+                else { List<Coordinates> pieceMoves = piece.GetAvailableMoves(); }
+                foreach (var coords in pieceMoves)
+                {
+                    opponentPanels.Add(GetPanel(coords));
+                }
+            }
+            return opponentPanels.Distinct().ToList();
         }
 
         public List<Coordinates> Cross()
@@ -173,9 +194,6 @@ namespace Chess
         }
 
         public abstract List<Coordinates> GetAvailableMoves();
-        /*{
-            return null;
-        }*/
     }
 
     public class Rook : Piece
@@ -188,6 +206,7 @@ namespace Chess
             Name = "Rook";
             Character = 'R';
             Place(coords);
+            SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
@@ -206,6 +225,7 @@ namespace Chess
             Name = "Bishop";
             Character = 'B';
             Place(coords);
+            SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
@@ -224,6 +244,7 @@ namespace Chess
             Name = "Queen";
             Character = 'Q';
             Place(coords);
+            SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
@@ -242,6 +263,7 @@ namespace Chess
             Name = "Knight";
             Character = 'N';
             Place(coords);
+            SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
@@ -286,6 +308,7 @@ namespace Chess
             Name = "Pawn";
             Character = 'P';
             Place(coords);
+            SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
@@ -326,7 +349,6 @@ namespace Chess
 
     public class King : Piece
     {
-        public Player Player { get; set; }
         public King(GameBoard board, Coordinates coords, Color color)
         {
             GameBoard = board;
@@ -334,9 +356,8 @@ namespace Chess
             Coordinates = coords;
             Name = "King";
             Character = 'K';
-            if (board.Game.Player1.Color == color) { Player = board.Game.Player1; }
-            else if (board.Game.Player2.Color == color) { Player = board.Game.Player2; }
             Place(coords);
+            SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
@@ -361,10 +382,9 @@ namespace Chess
         {
             get
             {
-                /*var pan = GameBoard.GetPanel(Coordinates);
+                var pan = GameBoard.GetPanel(Coordinates);
                 List<Panel> opponentPanels = GameBoard.GetOpponentPanels(pan);
-                return opponentPanels.Contains(pan);*/
-                return false;
+                return opponentPanels.Contains(pan);
             }
         }
     }
