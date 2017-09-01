@@ -10,7 +10,7 @@ namespace Chess
         public string Name { get; set; }
         public Coordinates Coordinates { get; set; }
         public Color Color { get; set; }
-        private char Character { get; set; }
+        protected char Character { get; set; }
         public GameBoard GameBoard { get; set; }
         public Player Player { get; private set; }
 
@@ -40,11 +40,12 @@ namespace Chess
             var opponentPanels = new List<Panel>();
             foreach (var piece in Player.Opponent.Pieces)
             {
-                if (piece.Name == "King") { List<Coordinates> pieceMoves = piece.Cross(1).Concat(piece.Diagonal(1)).ToList(); }
-                else { List<Coordinates> pieceMoves = piece.GetAvailableMoves(); }
+                List<Coordinates> pieceMoves;
+                if (piece.Name == "King") { pieceMoves = piece.Cross(1).Concat(piece.Diagonal(1)).ToList(); }
+                else { pieceMoves = piece.GetAvailableMoves(); }
                 foreach (var coords in pieceMoves)
                 {
-                    opponentPanels.Add(GetPanel(coords));
+                    opponentPanels.Add(GameBoard.GetPanel(coords));
                 }
             }
             return opponentPanels.Distinct().ToList();
@@ -369,7 +370,7 @@ namespace Chess
                 if (coords.Valid)
                 {
                     var pan = GameBoard.GetPanel(coords);
-                    List<Panel> opponentPanels = GameBoard.GetOpponentPanels(GameBoard.GetPanel(Coordinates));
+                    List<Panel> opponentPanels = GetOpponentPanels();
                     if (!opponentPanels.Contains(pan)) { output.Add(pan.Coordinates); }
                 }
             }
@@ -383,7 +384,7 @@ namespace Chess
             get
             {
                 var pan = GameBoard.GetPanel(Coordinates);
-                List<Panel> opponentPanels = GameBoard.GetOpponentPanels(pan);
+                List<Panel> opponentPanels = GetOpponentPanels();
                 return opponentPanels.Contains(pan);
             }
         }

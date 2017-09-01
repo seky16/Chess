@@ -189,7 +189,7 @@ namespace Chess
             return pan;
         }
 
-        public List<Panel> GetOpponentPanels(Panel panelOpponent)
+        /*public List<Panel> GetOpponentPanels(Panel panelOpponent)
         {
             var opponentPanels = new List<Panel>();
             foreach (var pan in Panels)
@@ -205,7 +205,7 @@ namespace Chess
                 }
             }
             return opponentPanels.Distinct().ToList();
-        }
+        }*/
 
         public string Output()
         {

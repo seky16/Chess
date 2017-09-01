@@ -4,13 +4,12 @@ using System.Text;
 
 namespace Chess
 {
-    //[Serializable]
+    [Serializable]
     public class InvalidMoveException : Exception
     {
         public InvalidMoveException()
-        {
-            //InvalidMoveException("Invalid Move");
-        }
+            : this("Invalid Move")
+        { }
 
         public InvalidMoveException(string message)
             : base(message)

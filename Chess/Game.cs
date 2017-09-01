@@ -18,14 +18,5 @@ namespace Chess
             Player1.PlacePieces();
             Player2.PlacePieces();
         }
-
-        public Player GetOpponent(Player thisPlayer)
-        {
-                 if (thisPlayer == Player1) { return Player2; }
-            else if (thisPlayer == Player2) { return Player1; }
-            else { throw new Exception("Game is not set properly!"); }
-        }
-
-        
     }
 }

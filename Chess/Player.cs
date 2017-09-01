@@ -25,7 +25,7 @@ namespace Chess
         }
         public GameBoard GameBoard { get; set; }
         public Game Game { get; set; }
-        public Player Opponent => Game.GetOpponent(this);
+        public Player Opponent => GetOpponent();
         public King King
         { get
             {
@@ -64,7 +64,7 @@ namespace Chess
                 var p1 = GameBoard.GetPanel(BaseRow, 1);
                 var p2 = GameBoard.GetPanel(BaseRow, 2);
                 if (p1.IsPiece || p2.IsPiece) { return false; }
-                var opponentMoves = GameBoard.GetOpponentPanels(GameBoard.GetPanel(King.Coordinates));
+                var opponentMoves = King.GetOpponentPanels();
                 if (opponentMoves.Contains(p1) || opponentMoves.Contains(p2)) { return false; }
                 return true;
             }
@@ -78,7 +78,7 @@ namespace Chess
                 var p1 = GameBoard.GetPanel(BaseRow, 5);
                 var p2 = GameBoard.GetPanel(BaseRow, 6);
                 if (p1.IsPiece || p2.IsPiece) { return false; }
-                var opponentMoves = GameBoard.GetOpponentPanels(GameBoard.GetPanel(King.Coordinates));
+                var opponentMoves = King.GetOpponentPanels();
                 if (opponentMoves.Contains(p1) || opponentMoves.Contains(p2)) { return false; }
                 return true;
             }
@@ -93,6 +93,13 @@ namespace Chess
             KingMoved = false;
             LeftRookMoved = false;
             RightRookMoved = false;
+        }
+
+        private Player GetOpponent()
+        {
+            if (this == Game.Player1) { return Game.Player2; }
+            else if (this == Game.Player2) { return Game.Player1; }
+            else { throw new Exception("Game is not set properly!"); }
         }
 
         public void PlacePieces()
