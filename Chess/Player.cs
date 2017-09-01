@@ -9,7 +9,8 @@ namespace Chess
     {
         public string Name { get; set; }
         public Color Color { get; set; }
-        public List<Piece> Pieces { get
+        public List<Piece> Pieces
+        { get
             {
                 var output = new List<Piece>();
                 foreach (var pan in GameBoard.Panels)
@@ -25,48 +26,62 @@ namespace Chess
         public GameBoard GameBoard { get; set; }
         public Game Game { get; set; }
         public Player Opponent => Game.GetOpponent(this);
-        public King King =>
-        {
-            foreach (var p in Pieces)
+        public King King
+        { get
             {
-                if (p.Name == "King") { return p as King; }
+                foreach (var p in Pieces)
+                {
+                    if (p.Name == "King") { return p as King; }
+                }
+                return null;
             }
         }
-        public bool CheckMate =>
-        {
-            List<Coordinates> moves = King.AvailableMoves;
-            return King.IsInCheck && (moves?.Count() ?? 0) == 0);
+        public bool CheckMate
+        { get
+            {
+                if (!King.IsInCheck) { return false; }
+                List<Coordinates> moves = King.GetAvailableMoves();
+                return (moves?.Count() ?? 0) == 0;
+            }
         }
-        public int BaseRow => 
-        {
-            if (Color == Color.White) { return 7; }
-            else if (Color == Color.Black) { return 0; }
-            else { return -1; }
+        public int BaseRow
+        { get
+            {
+                if (Color == Color.White) { return 7; }
+                else if (Color == Color.Black) { return 0; }
+                else { return -1; }
+            }
         }
         public bool KingMoved { get; set; }
         public bool LeftRookMoved { get; set; }
         public bool RightRookMoved { get; set; }
-        public bool CanLeftCastle =>
+        public bool CanLeftCastle
         {
-            if (KingMoved) { return false; }
-            if (LeftRookMoved) { return false; }
-            var p1 = GameBoard.GetPanel(BaseRow, 1);
-            var p2 = GameBoard.GetPanel(BaseRow, 2);
-            if (p1.IsPiece || p2.IsPiece) { return false; }
-            var opponentMoves = GameBoard.GetOpponentPanels();
-            if (opponentMoves.Contains(p1) || opponentMoved.Contains(p2)) { return false; }
-            return true;
+            get
+            {
+                if (KingMoved) { return false; }
+                if (LeftRookMoved) { return false; }
+                var p1 = GameBoard.GetPanel(BaseRow, 1);
+                var p2 = GameBoard.GetPanel(BaseRow, 2);
+                if (p1.IsPiece || p2.IsPiece) { return false; }
+                var opponentMoves = GameBoard.GetOpponentPanels(GameBoard.GetPanel(King.Coordinates));
+                if (opponentMoves.Contains(p1) || opponentMoves.Contains(p2)) { return false; }
+                return true;
+            }
         }
-        public bool CanRightCastle =>
+        public bool CanRightCastle
         {
-            if (KingMoved) { return false; }
-            if (RightRookMoved) { return false; }
-            var p1 = GameBoard.GetPanel(BaseRow, 5);
-            var p2 = GameBoard.GetPanel(BaseRow, 6);
-            if (p1.IsPiece || p2.IsPiece) { return false; }
-            var opponentMoves = GameBoard.GetOpponentPanels();
-            if (opponentMoves.Contains(p1) || opponentMoved.Contains(p2)) { return false; }
-            return true;
+            get
+            {
+                if (KingMoved) { return false; }
+                if (RightRookMoved) { return false; }
+                var p1 = GameBoard.GetPanel(BaseRow, 5);
+                var p2 = GameBoard.GetPanel(BaseRow, 6);
+                if (p1.IsPiece || p2.IsPiece) { return false; }
+                var opponentMoves = GameBoard.GetOpponentPanels(GameBoard.GetPanel(King.Coordinates));
+                if (opponentMoves.Contains(p1) || opponentMoves.Contains(p2)) { return false; }
+                return true;
+            }
         }
 
         public Player(string name, Color color, Game game)

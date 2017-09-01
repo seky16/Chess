@@ -11,7 +11,7 @@ namespace Chess
             var player1 = game.Player1;
             var player2 = game.Player2;
             Console.WriteLine(board.Output());
-            while (!Player1.CheckMate)
+            while (!player1.CheckMate || !player2.CheckMate)
             {
                 Console.Write($"{player1.Name}: ");
                 string input1 = Console.ReadLine();

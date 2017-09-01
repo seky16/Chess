@@ -112,7 +112,7 @@ namespace Chess
             {
                 var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
                 if (!Player.Pieces.Contains(startPiece)) { return false; }
-                var moves = startPiece.AvailableMoves;
+                var moves = startPiece.GetAvailableMoves();
                 bool endCoordsCheck = false;
                 foreach (var coords in moves)
                 {
@@ -126,10 +126,10 @@ namespace Chess
         {
             if (!IsValid()) { throw new InvalidMoveException(); }
             var startPiece = GameBoard.GetPanel(StartCoordinates).Piece;
-            //if ((Player.Pieces.FirstOrDefault(p => p.Name == "King") as King).IsInCheck && startPiece.Name != "King") { throw new InvalidMoveException("King is in check! You have to defend him!"); }
+            //if ((Player.King.IsInCheck && startPiece.Name != "King") { throw new InvalidMoveException("King is in check! You have to defend him!"); }
             startPiece.Remove(StartCoordinates);
             startPiece.Place(EndCoordinates);
-            if (startPiece.Name == "King" && StartCoordinates.Column == 4; ) { Player.KingMoved = true; }
+            if (startPiece.Name == "King" && StartCoordinates.Column == 4) { Player.KingMoved = true; }
             if (startPiece.Name == "Rook")
             {
                 if (StartCoordinates.Column == 0) { Player.LeftRookMoved = true; }
@@ -141,7 +141,7 @@ namespace Chess
                 var p = GameBoard.GetPanel(Player.BaseRow, 0);
                 var rook = p?.Piece;
                 rook.Remove(p.Coordinates);
-                rook.Place(GameBoard.GetPanel(Player.BaseRow, 3);
+                rook.Place(GameBoard.GetPanel(Player.BaseRow, 3).Coordinates);
             }
 
             if (startPiece.Name == "King" && StartCoordinates.Column == 4 && EndCoordinates.Column == 6)
@@ -149,7 +149,7 @@ namespace Chess
                 var p = GameBoard.GetPanel(Player.BaseRow, 7);
                 var rook = p?.Piece;
                 rook.Remove(p.Coordinates);
-                rook.Place(GameBoard.GetPanel(Player.BaseRow, 5);
+                rook.Place(GameBoard.GetPanel(Player.BaseRow, 5).Coordinates);
             }
         }
     }
@@ -180,7 +180,12 @@ namespace Chess
         public Panel GetPanel(Coordinates coords)
         {
             if (!coords.Valid) { return null; }// throw new Exception(); }
-            Panel pan = Panels.Where(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column)).FirstOrDefault();
+                                               //Panel pan = Panels.FirstOrDefault(p => (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column));
+            Panel pan = null;
+            foreach (var p in Panels)
+            {
+                if (p.Coordinates.Row == coords.Row && p.Coordinates.Column == coords.Column) { pan = p; break; }
+            }
             return pan;
         }
 
@@ -191,7 +196,7 @@ namespace Chess
             {
                 if (pan.IsPiece && (pan.Piece?.IsOpponent(panelOpponent) ?? false))
                 {
-                    List<Coordinates> pieceMoves = pan.Piece.AvailableMoves;
+                    List<Coordinates> pieceMoves = pan.Piece.GetAvailableMoves();
                     foreach (var coords in pieceMoves)
                     {
                         opponentPanels.Add(GetPanel(coords));

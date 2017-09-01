@@ -9,7 +9,7 @@ namespace Chess
     {
         public string Name { get; set; }
         public Coordinates Coordinates { get; set; }
-        public List<Coordinates> AvailableMoves { get { return GetAvailableMoves(); } }
+        //public List<Coordinates> AvailableMoves { get { return GetAvailableMoves(); } }
         public Color Color { get; set; }
         protected char Character { get; set; }
         public GameBoard GameBoard { get; set; }
@@ -37,13 +37,12 @@ namespace Chess
         //todo: shorten?
         public List<Coordinates> Cross(int radius)
         {
-            var board = GameBoard;
-            var coords = Coordinates;
             var output = new List<Coordinates>();
             for (int i = 1; i <= radius; i++)
             {
-                int r = coords.Row - i;
-                Panel pan = board.GetPanel(r, coords.Column);
+                int r = Coordinates.Row - i;
+                int c = Coordinates.Column;
+                Panel pan = GameBoard.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
@@ -54,8 +53,9 @@ namespace Chess
             }
             for (int i = 1; i <= radius; i++)
             {
-                int r = coords.Row + i;
-                Panel pan = board.GetPanel(r, coords.Column);
+                int r = Coordinates.Row + i;
+                int c = Coordinates.Column;
+                Panel pan = GameBoard.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
@@ -66,8 +66,9 @@ namespace Chess
             }
             for (int i = 1; i <= radius; i++)
             {
-                int c = coords.Column - i;
-                Panel pan = board.GetPanel(coords.Row, c);
+                int r = Coordinates.Row;
+                int c = Coordinates.Column - i;
+                Panel pan = GameBoard.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
@@ -78,8 +79,9 @@ namespace Chess
             }
             for (int i = 1; i <= radius; i++)
             {
-                int c = coords.Column + i;
-                Panel pan = board.GetPanel(coords.Row, c);
+                int r = Coordinates.Row;
+                int c = Coordinates.Column + i;
+                Panel pan = GameBoard.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
                     if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
@@ -170,10 +172,10 @@ namespace Chess
             panel.Piece = null;
         }
 
-        protected virtual List<Coordinates> GetAvailableMoves()
-        {
+        public abstract List<Coordinates> GetAvailableMoves();
+        /*{
             return null;
-        }
+        }*/
     }
 
     public class Rook : Piece
@@ -188,7 +190,7 @@ namespace Chess
             Place(coords);
         }
 
-        protected override List<Coordinates> GetAvailableMoves()
+        public override List<Coordinates> GetAvailableMoves()
         {
             return Cross();
         }
@@ -206,7 +208,7 @@ namespace Chess
             Place(coords);
         }
 
-        protected override List<Coordinates> GetAvailableMoves()
+        public override List<Coordinates> GetAvailableMoves()
         {
             return Diagonal();
         }
@@ -224,7 +226,7 @@ namespace Chess
             Place(coords);
         }
 
-        protected override List<Coordinates> GetAvailableMoves()
+        public override List<Coordinates> GetAvailableMoves()
         {
             return Cross().Concat(Diagonal()).ToList();
         }
@@ -242,7 +244,7 @@ namespace Chess
             Place(coords);
         }
 
-        protected override List<Coordinates> GetAvailableMoves()
+        public override List<Coordinates> GetAvailableMoves()
         {
             var board = GameBoard;
             var r = Coordinates.Row;
@@ -286,7 +288,7 @@ namespace Chess
             Place(coords);
         }
 
-        protected override List<Coordinates> GetAvailableMoves()
+        public override List<Coordinates> GetAvailableMoves()
         {
             var output = new List<Coordinates>();
             if (Color == Color.White)
@@ -332,12 +334,12 @@ namespace Chess
             Coordinates = coords;
             Name = "King";
             Character = 'K';
-            if (board.Game.Player1.Color == color) { Player = Player1; }
-            else if (board.Game.Player2.Color == color) { Player = Player2; }
+            if (board.Game.Player1.Color == color) { Player = board.Game.Player1; }
+            else if (board.Game.Player2.Color == color) { Player = board.Game.Player2; }
             Place(coords);
         }
 
-        protected override List<Coordinates> GetAvailableMoves()
+        public override List<Coordinates> GetAvailableMoves()
         {
             var output = new List<Coordinates>();
             List<Coordinates> possible = Cross(1).Concat(Diagonal(1)).ToList();
@@ -359,9 +361,10 @@ namespace Chess
         {
             get
             {
-                var pan = GameBoard.GetPanel(Coordinates);
+                /*var pan = GameBoard.GetPanel(Coordinates);
                 List<Panel> opponentPanels = GameBoard.GetOpponentPanels(pan);
-                return opponentPanels.Contains(pan);
+                return opponentPanels.Contains(pan);*/
+                return false;
             }
         }
     }
