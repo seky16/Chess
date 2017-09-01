@@ -196,7 +196,8 @@ namespace Chess
             {
                 if (pan.IsPiece && (pan.Piece?.IsOpponent(panelOpponent) ?? false))
                 {
-                    List<Coordinates> pieceMoves = pan.Piece.GetAvailableMoves();
+                    if (pan.Piece.Name == "King") { List<Coordinates> pieceMoves = pan.Piece.Cross(1).Concat(pan.Piece.Diagonal(1)).ToList(); }
+                    else { List<Coordinates> pieceMoves = pan.Piece.GetAvailableMoves(); }
                     foreach (var coords in pieceMoves)
                     {
                         opponentPanels.Add(GetPanel(coords));
