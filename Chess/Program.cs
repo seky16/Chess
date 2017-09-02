@@ -1,10 +1,12 @@
-using System;
+// ReSharper disable StyleCop.SA1600
 
 namespace Chess
 {
-    internal class Program
+    using System;
+
+    internal static class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             var game = new Game("Player1", "Player2");
             var board = game.GameBoard;
@@ -22,7 +24,11 @@ namespace Chess
                 Console.WriteLine(board.Output());
                 Console.WriteLine($"{player1.Name}: {player1Move.Display()}");
 
-                if (player2.CheckMate) continue;
+                if (player2.CheckMate)
+                {
+                    continue;
+                }
+
                 Console.Write($"{player2.Name}: ");
                 var input3 = Console.ReadLine();
                 var input4 = Console.ReadLine();

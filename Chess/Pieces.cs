@@ -1,29 +1,30 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
+// ReSharper disable StyleCop.SA1600
+// ReSharper disable StyleCop.SA1402
 
 namespace Chess
 {
-    public abstract class Piece
-    {
-        public string Name { get; set; }
-        public Coordinates Coordinates { get; set; }
-        public Color Color { get; set; }
-        protected char Character { get; set; }
-        public GameBoard GameBoard { get; set; }
-        public Player Player { get; private set; }
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
-        protected void SetPlayer()
-        {
-            if (GameBoard.Game.Player1.Color == Color) { Player = GameBoard.Game.Player1; }
-            else if (GameBoard.Game.Player2.Color == Color) { Player = GameBoard.Game.Player2; }
-        }
+    public abstract class Pieces
+    {
+        public string Name { get; protected set; }
+
+        public Color Color { get; protected set; }
+
+        protected Coordinates Coordinates { get; set; }
+
+        protected char Character { private get; set; }
+
+        protected GameBoard GameBoard { get; set; }
+
+        protected Player Player { get; private set; }
 
         public char Show()
         {
-            var r = Character;
-                 switch (Color)
+            var r = this.Character;
+                 switch (this.Color)
                  {
                      case Color.White:
                          r = char.ToUpper(r);
@@ -32,105 +33,166 @@ namespace Chess
                          r = char.ToLower(r);
                          break;
                      default:
+                         // ReSharper disable once UnthrowableException
                          throw new Exception();
                  }
-            return r;
-        }
 
-        public bool IsOpponent(Panel pan)
-        {
-            if (!pan?.IsPiece ?? false) { return false; }
-            return pan != null && pan.Piece.Color != Color;
+            return r;
         }
 
         public List<Panel> GetOpponentPanels()
         {
             var opponentPanels = new List<Panel>();
-            foreach (var piece in Player.Opponent.Pieces)
+            foreach (var piece in this.Player.Opponent.Pieces)
             {
                 var pieceMoves = piece.Name == "King" ? piece.Cross(1).Concat(piece.Diagonal(1)).ToList() : piece.GetAvailableMoves();
                 foreach (var coords in pieceMoves)
                 {
-                    opponentPanels.Add(GameBoard.GetPanel(coords));
+                    opponentPanels.Add(this.GameBoard.GetPanel(coords));
                 }
             }
+
             return opponentPanels.Distinct().ToList();
         }
 
-        public List<Coordinates> Cross()
+        public void MoveTo(Coordinates coords)
         {
-            return Cross(7);
+            this.Remove();
+            this.Place(coords);
         }
 
-        //todo: shorten?
-        public List<Coordinates> Cross(int radius)
+        public abstract List<Coordinates> GetAvailableMoves();
+
+        protected List<Coordinates> Cross(int radius = 7)
         {
             var output = new List<Coordinates>();
             for (var i = 1; i <= radius; i++)
             {
-                var r = Coordinates.Row - i;
-                var c = Coordinates.Column;
-                var pan = GameBoard.GetPanel(r, c);
+                var r = this.Coordinates.Row - i;
+                var c = this.Coordinates.Column;
+                var pan = this.GameBoard.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
-                    if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
-                    if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
-                    if (!IsOpponent(pan)) { break; }
+                    if (!pan.IsPiece)
+                    {
+                        output.Add(pan.Coordinates);
+                        continue;
+                    }
+
+                    if (this.IsOpponent(pan))
+                    {
+                        output.Add(pan.Coordinates);
+                        break;
+                    }
+
+                    if (!this.IsOpponent(pan))
+                    {
+                        break;
+                    }
                 }
-                else break;
+                else
+                {
+                    break;
+                }
             }
+
             for (var i = 1; i <= radius; i++)
             {
-                var r = Coordinates.Row + i;
-                var c = Coordinates.Column;
-                var pan = GameBoard.GetPanel(r, c);
+                var r = this.Coordinates.Row + i;
+                var c = this.Coordinates.Column;
+                var pan = this.GameBoard.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
-                    if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
-                    if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
-                    if (!IsOpponent(pan)) { break; }
+                    if (!pan.IsPiece)
+                    {
+                        output.Add(pan.Coordinates);
+                        continue;
+                    }
+
+                    if (this.IsOpponent(pan))
+                    {
+                        output.Add(pan.Coordinates);
+                        break;
+                    }
+
+                    if (!this.IsOpponent(pan))
+                    {
+                        break;
+                    }
                 }
-                else break;
+                else
+                {
+                    break;
+                }
             }
+
             for (var i = 1; i <= radius; i++)
             {
-                var r = Coordinates.Row;
-                var c = Coordinates.Column - i;
-                var pan = GameBoard.GetPanel(r, c);
+                var r = this.Coordinates.Row;
+                var c = this.Coordinates.Column - i;
+                var pan = this.GameBoard.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
-                    if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
-                    if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
-                    if (!IsOpponent(pan)) { break; }
+                    if (!pan.IsPiece)
+                    {
+                        output.Add(pan.Coordinates);
+                        continue;
+                    }
+
+                    if (this.IsOpponent(pan))
+                    {
+                        output.Add(pan.Coordinates);
+                        break;
+                    }
+
+                    if (!this.IsOpponent(pan))
+                    {
+                        break;
+                    }
                 }
-                else break;
+                else
+                {
+                    break;
+                }
             }
+
             for (var i = 1; i <= radius; i++)
             {
-                var r = Coordinates.Row;
-                var c = Coordinates.Column + i;
-                var pan = GameBoard.GetPanel(r, c);
+                var r = this.Coordinates.Row;
+                var c = this.Coordinates.Column + i;
+                var pan = this.GameBoard.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
-                    if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
-                    if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
-                    if (!IsOpponent(pan)) { break; }
+                    if (!pan.IsPiece)
+                    {
+                        output.Add(pan.Coordinates);
+                        continue;
+                    }
+
+                    if (this.IsOpponent(pan))
+                    {
+                        output.Add(pan.Coordinates);
+                        break;
+                    }
+
+                    if (!this.IsOpponent(pan))
+                    {
+                        break;
+                    }
                 }
-                else break;
+                else
+                {
+                    break;
+                }
             }
+
             return output;
         }
 
-        public List<Coordinates> Diagonal()
+        protected List<Coordinates> Diagonal(int radius = 7)
         {
-            return Diagonal(7);
-        }
-
-        //todo: shorten?
-        public List<Coordinates> Diagonal(int radius)
-        {
-            var board = GameBoard;
-            var coords = Coordinates;
+            var board = this.GameBoard;
+            var coords = this.Coordinates;
             var output = new List<Coordinates>();
             for (var i = 1; i <= radius; i++)
             {
@@ -139,12 +201,29 @@ namespace Chess
                 var pan = board.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
-                    if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
-                    if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
-                    if (!IsOpponent(pan)) { break; }
+                    if (!pan.IsPiece)
+                    {
+                        output.Add(pan.Coordinates);
+                        continue;
+                    }
+
+                    if (this.IsOpponent(pan))
+                    {
+                        output.Add(pan.Coordinates);
+                        break;
+                    }
+
+                    if (!this.IsOpponent(pan))
+                    {
+                        break;
+                    }
                 }
-                else break;
+                else
+                {
+                    break;
+                }
             }
+
             for (var i = 1; i <= radius; i++)
             {
                 var r = coords.Row - i;
@@ -152,12 +231,29 @@ namespace Chess
                 var pan = board.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
-                    if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
-                    if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
-                    if (!IsOpponent(pan)) { break; }
+                    if (!pan.IsPiece)
+                    {
+                        output.Add(pan.Coordinates);
+                        continue;
+                    }
+
+                    if (this.IsOpponent(pan))
+                    {
+                        output.Add(pan.Coordinates);
+                        break;
+                    }
+
+                    if (!this.IsOpponent(pan))
+                    {
+                        break;
+                    }
                 }
-                else break;
+                else
+                {
+                    break;
+                }
             }
+
             for (var i = 1; i <= radius; i++)
             {
                 var r = coords.Row + i;
@@ -165,12 +261,29 @@ namespace Chess
                 var pan = board.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
-                    if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
-                    if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
-                    if (!IsOpponent(pan)) { break; }
+                    if (!pan.IsPiece)
+                    {
+                        output.Add(pan.Coordinates);
+                        continue;
+                    }
+
+                    if (this.IsOpponent(pan))
+                    {
+                        output.Add(pan.Coordinates);
+                        break;
+                    }
+
+                    if (!this.IsOpponent(pan))
+                    {
+                        break;
+                    }
                 }
-                else break;
+                else
+                {
+                    break;
+                }
             }
+
             for (var i = 1; i <= radius; i++)
             {
                 var r = coords.Row + i;
@@ -178,112 +291,143 @@ namespace Chess
                 var pan = board.GetPanel(r, c);
                 if (pan?.Coordinates?.Valid ?? false)
                 {
-                    if (!pan.IsPiece) { output.Add(pan.Coordinates); continue; }
-                    if (IsOpponent(pan)) { output.Add(pan.Coordinates); break; }
-                    if (!IsOpponent(pan)) { break; }
+                    if (!pan.IsPiece)
+                    {
+                        output.Add(pan.Coordinates);
+                        continue;
+                    }
+
+                    if (this.IsOpponent(pan))
+                    {
+                        output.Add(pan.Coordinates);
+                        break;
+                    }
+
+                    if (!this.IsOpponent(pan))
+                    {
+                        break;
+                    }
                 }
-                else break;
+                else
+                {
+                    break;
+                }
             }
+
             return output;
         }
 
         protected void Place(Coordinates coords)
         {
-            var panel = GameBoard.GetPanel(coords);
+            var panel = this.GameBoard.GetPanel(coords);
             panel.Piece = this;
-            Coordinates = panel.Coordinates;
+            this.Coordinates = panel.Coordinates;
         }
 
-        protected void Remove()
+        protected bool IsOpponent(Panel pan)
         {
-            var panel = GameBoard.GetPanel(Coordinates);
+            if (!pan?.IsPiece ?? false)
+            {
+                return false;
+            }
+
+            return pan != null && pan.Piece.Color != this.Color;
+        }
+
+        protected void SetPlayer()
+        {
+            if (this.GameBoard.Game.Player1.Color == this.Color)
+            {
+                this.Player = this.GameBoard.Game.Player1;
+            }
+            else if (this.GameBoard.Game.Player2.Color == this.Color)
+            {
+                this.Player = this.GameBoard.Game.Player2;
+            }
+        }
+
+        private void Remove()
+        {
+            var panel = this.GameBoard.GetPanel(this.Coordinates);
             panel.Piece = null;
         }
-
-        public void MoveTo(Coordinates coords)
-        {
-            Remove();
-            Place(coords);
-        }
-
-        public abstract List<Coordinates> GetAvailableMoves();
     }
 
-    public class Rook : Piece
+    public class Rook : Pieces
     {
         public Rook(GameBoard board, Coordinates coords, Color color)
         {
-            GameBoard = board;
-            Color = color;
-            Coordinates = coords;
-            Name = "Rook";
-            Character = 'R';
-            Place(coords);
-            SetPlayer();
+            this.GameBoard = board;
+            this.Color = color;
+            this.Coordinates = coords;
+            this.Name = "Rook";
+            this.Character = 'R';
+            this.Place(coords);
+            this.SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
         {
-            return Cross();
+            return this.Cross();
         }
     }
 
-    public class Bishop : Piece
+    public class Bishop : Pieces
     {
         public Bishop(GameBoard board, Coordinates coords, Color color)
         {
-            GameBoard = board;
-            Color = color;
-            Coordinates = coords;
-            Name = "Bishop";
-            Character = 'B';
-            Place(coords);
-            SetPlayer();
+            this.GameBoard = board;
+            this.Color = color;
+            this.Coordinates = coords;
+            this.Name = "Bishop";
+            this.Character = 'B';
+            this.Place(coords);
+            this.SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
         {
-            return Diagonal();
+            return this.Diagonal();
         }
     }
 
-    public class Queen : Piece
+    public class Queen : Pieces
     {
         public Queen(GameBoard board, Coordinates coords, Color color)
         {
-            GameBoard = board;
-            Color = color;
-            Coordinates = coords;
-            Name = "Queen";
-            Character = 'Q';
-            Place(coords);
-            SetPlayer();
+            this.GameBoard = board;
+            this.Color = color;
+            this.Coordinates = coords;
+            this.Name = "Queen";
+            this.Character = 'Q';
+            this.Place(coords);
+            this.SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
         {
-            return Cross().Concat(Diagonal()).ToList();
+            return this.Cross().Concat(this.Diagonal()).ToList();
         }
     }
 
-    public class Knight : Piece
+    public class Knight : Pieces
     {
         public Knight(GameBoard board, Coordinates coords, Color color)
         {
-            GameBoard = board;
-            Color = color;
-            Coordinates = coords;
-            Name = "Knight";
-            Character = 'N';
-            Place(coords);
-            SetPlayer();
+            this.GameBoard = board;
+            this.Color = color;
+            this.Coordinates = coords;
+            this.Name = "Knight";
+            this.Character = 'N';
+            this.Place(coords);
+            this.SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
         {
-            var board = GameBoard;
-            var r = Coordinates.Row;
-            var c = Coordinates.Column;
+            var board = this.GameBoard;
+            var r = this.Coordinates.Row;
+            var c = this.Coordinates.Column;
             var output = new List<Coordinates>();
             var possible = new List<Coordinates>()
             {
@@ -297,100 +441,165 @@ namespace Chess
                 board.GetPanel(r - 2, c - 1)?.Coordinates
             };
 
-
             foreach (var coords in possible)
             {
-                if (!(coords?.Valid ?? false)) continue;
+                if (!(coords?.Valid ?? false))
+                {
+                    continue;
+                }
+
                 var pan = board.GetPanel(coords);
-                if (!pan.IsPiece) { output.Add(pan.Coordinates); }
-                else if (IsOpponent(pan)) { output.Add(pan.Coordinates); }
+                if (!pan.IsPiece)
+                {
+                    output.Add(pan.Coordinates);
+                }
+                else if (this.IsOpponent(pan))
+                {
+                    output.Add(pan.Coordinates);
+                }
             }
+
             return output;
         }
     }
 
-    public class Pawn : Piece
+    public class Pawn : Pieces
     {
         public Pawn(GameBoard board, Coordinates coords, Color color)
         {
-            GameBoard = board;
-            Color = color;
-            Coordinates = coords;
-            Name = "Pawn";
-            Character = 'P';
-            Place(coords);
-            SetPlayer();
+            this.GameBoard = board;
+            this.Color = color;
+            this.Coordinates = coords;
+            this.Name = "Pawn";
+            this.Character = 'P';
+            this.Place(coords);
+            this.SetPlayer();
         }
 
         public override List<Coordinates> GetAvailableMoves()
         {
             var output = new List<Coordinates>();
-            if (Color == Color.White)
+            if (this.Color == Color.White)
             {
-                var up = GameBoard.GetPanel(Coordinates.Row - 1, Coordinates.Column);
-                if ((up?.Coordinates?.Valid ?? false) && ((!up?.IsPiece) ?? false)) { output.Add(up.Coordinates); }
-                var upL = GameBoard.GetPanel(Coordinates.Row - 1, Coordinates.Column - 1);
-                if ((upL?.Coordinates?.Valid ?? false) && IsOpponent(upL)) { output.Add(upL.Coordinates); }
-                var upR = GameBoard.GetPanel(Coordinates.Row - 1, Coordinates.Column + 1);
-                if ((upR?.Coordinates?.Valid ?? false) && IsOpponent(upR)) { output.Add(upR.Coordinates); }
-                if (Coordinates.Row != 6) return output;
-                var up2 = GameBoard.GetPanel(Coordinates.Row - 2, Coordinates.Column);
-                if (up2.Coordinates.Valid && !up2.IsPiece) { output.Add(up2.Coordinates); }
+                var up = this.GameBoard.GetPanel(this.Coordinates.Row - 1, this.Coordinates.Column);
+                if ((up?.Coordinates?.Valid ?? false) && !up.IsPiece)
+                {
+                    output.Add(up.Coordinates);
+                }
+
+                var upL = this.GameBoard.GetPanel(this.Coordinates.Row - 1, this.Coordinates.Column - 1);
+                if ((upL?.Coordinates?.Valid ?? false) && this.IsOpponent(upL))
+                {
+                    output.Add(upL.Coordinates);
+                }
+
+                var upR = this.GameBoard.GetPanel(this.Coordinates.Row - 1, this.Coordinates.Column + 1);
+                if ((upR?.Coordinates?.Valid ?? false) && this.IsOpponent(upR))
+                {
+                    output.Add(upR.Coordinates);
+                }
+
+                if (this.Coordinates.Row != 6)
+                {
+                    return output;
+                }
+
+                var up2 = this.GameBoard.GetPanel(this.Coordinates.Row - 2, this.Coordinates.Column);
+                if (up2.Coordinates.Valid && !up2.IsPiece)
+                {
+                    output.Add(up2.Coordinates);
+                }
             }
             else
             {
-                var down = GameBoard.GetPanel(Coordinates.Row + 1, Coordinates.Column);
-                if ((down?.Coordinates?.Valid ?? false) && ((!down?.IsPiece) ?? false)) { output.Add(down.Coordinates); }
-                var downL = GameBoard.GetPanel(Coordinates.Row + 1, Coordinates.Column - 1);
-                if ((downL?.Coordinates?.Valid ?? false) && IsOpponent(downL)) { output.Add(downL.Coordinates); }
-                var downR = GameBoard.GetPanel(Coordinates.Row + 1, Coordinates.Column + 1);
-                if ((downR?.Coordinates?.Valid ?? false) && IsOpponent(downR)) { output.Add(downR.Coordinates); }
-                if (Coordinates.Row != 1) return output;
-                var down2 = GameBoard.GetPanel(Coordinates.Row + 2, Coordinates.Column);
-                if (down2.Coordinates.Valid && !down2.IsPiece) { output.Add(down2.Coordinates); }
+                var down = this.GameBoard.GetPanel(this.Coordinates.Row + 1, this.Coordinates.Column);
+                if ((down?.Coordinates?.Valid ?? false) && !down.IsPiece)
+                {
+                    output.Add(down.Coordinates);
+                }
+
+                var downL = this.GameBoard.GetPanel(this.Coordinates.Row + 1, this.Coordinates.Column - 1);
+                if ((downL?.Coordinates?.Valid ?? false) && this.IsOpponent(downL))
+                {
+                    output.Add(downL.Coordinates);
+                }
+
+                var downR = this.GameBoard.GetPanel(this.Coordinates.Row + 1, this.Coordinates.Column + 1);
+                if ((downR?.Coordinates?.Valid ?? false) && this.IsOpponent(downR))
+                {
+                    output.Add(downR.Coordinates);
+                }
+
+                if (this.Coordinates.Row != 1)
+                {
+                    return output;
+                }
+
+                var down2 = this.GameBoard.GetPanel(this.Coordinates.Row + 2, this.Coordinates.Column);
+                if (down2.Coordinates.Valid && !down2.IsPiece)
+                {
+                    output.Add(down2.Coordinates);
+                }
             }
-            //en passant?
+
+            // en passant?
             return output;
         }
     }
 
-    public class King : Piece
+    public class King : Pieces
     {
         public King(GameBoard board, Coordinates coords, Color color)
         {
-            GameBoard = board;
-            Color = color;
-            Coordinates = coords;
-            Name = "King";
-            Character = 'K';
-            Place(coords);
-            SetPlayer();
-        }
-
-        public override List<Coordinates> GetAvailableMoves()
-        {
-            var output = new List<Coordinates>();
-            var possible = Cross(1).Concat(Diagonal(1)).ToList();
-            foreach (var coords in possible)
-            {
-                if (!coords.Valid) continue;
-                var pan = GameBoard.GetPanel(coords);
-                var opponentPanels = GetOpponentPanels();
-                if (!opponentPanels.Contains(pan)) { output.Add(pan.Coordinates); }
-            }
-            if (Player.CanLeftCastle) { output.Add(GameBoard.GetPanel(Player.BaseRow, 2).Coordinates); }
-            if (Player.CanRightCastle) { output.Add(GameBoard.GetPanel(Player.BaseRow, 6).Coordinates); }
-            return output;
+            this.GameBoard = board;
+            this.Color = color;
+            this.Coordinates = coords;
+            this.Name = "King";
+            this.Character = 'K';
+            this.Place(coords);
+            this.SetPlayer();
         }
 
         public bool IsInCheck
         {
             get
             {
-                var pan = GameBoard.GetPanel(Coordinates);
-                var opponentPanels = GetOpponentPanels();
+                var pan = this.GameBoard.GetPanel(this.Coordinates);
+                var opponentPanels = this.GetOpponentPanels();
                 return opponentPanels.Contains(pan);
             }
+        }
+
+        public override List<Coordinates> GetAvailableMoves()
+        {
+            var output = new List<Coordinates>();
+            var possible = this.Cross(1).Concat(this.Diagonal(1)).ToList();
+            foreach (var coords in possible)
+            {
+                if (!coords.Valid)
+                {
+                    continue;
+                }
+
+                var pan = this.GameBoard.GetPanel(coords);
+                var opponentPanels = this.GetOpponentPanels();
+                if (!opponentPanels.Contains(pan))
+                {
+                    output.Add(pan.Coordinates);
+                }
+            }
+
+            if (this.Player.CanLeftCastle)
+            {
+                output.Add(this.GameBoard.GetPanel(this.Player.BaseRow, 2).Coordinates);
+            }
+
+            if (this.Player.CanRightCastle)
+            {
+                output.Add(this.GameBoard.GetPanel(this.Player.BaseRow, 6).Coordinates);
+            }
+
+            return output;
         }
     }
 }

@@ -1,33 +1,55 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using System.Linq;
+// ReSharper disable StyleCop.SA1600
 
 namespace Chess
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+
     public class Player
     {
-        public string Name { get; set; }
-        public Color Color { get; set; }
-        public List<Piece> Pieces => (from pan in GameBoard.Panels where pan.IsPiece where pan.Piece.Color == Color select pan.Piece).ToList();
-        public GameBoard GameBoard { get; set; }
-        public Game Game { get; set; }
-        public Player Opponent => GetOpponent();
-        public King King => (from p in Pieces where p.Name == "King" select p as King).FirstOrDefault();
+        public Player(string name, Color color, Game game)
+        {
+            this.Game = game;
+            this.Name = name;
+            this.Color = color;
+            this.GameBoard = game.GameBoard;
+            this.KingMoved = false;
+            this.LeftRookMoved = false;
+            this.RightRookMoved = false;
+        }
+
+        public string Name { get; }
+
+        public Color Color { get; }
+
+        public List<Pieces> Pieces =>
+            (from pan in this.GameBoard.Panels where pan.IsPiece where pan.Piece.Color == this.Color select pan.Piece).ToList();
+
+        public GameBoard GameBoard { get; }
+
+        public Player Opponent => this.GetOpponent();
 
         public bool CheckMate
-        { get
+        {
+            get
             {
-                if (!King.IsInCheck) { return false; }
-                var moves = King.GetAvailableMoves();
-                return (moves?.Count() ?? 0) == 0;
+                if (!this.King.IsInCheck)
+                {
+                    return false;
+                }
+
+                var moves = this.King.GetAvailableMoves();
+                return (moves?.Count ?? 0) == 0;
             }
         }
+
         public int BaseRow
-        { get
+        {
+            get
             {
-                switch (Color)
+                switch (this.Color)
                 {
                     case Color.White:
                         return 7;
@@ -38,95 +60,128 @@ namespace Chess
                 }
             }
         }
-        public bool KingMoved { get; set; }
-        public bool LeftRookMoved { get; set; }
-        public bool RightRookMoved { get; set; }
+
+        public bool KingMoved { private get; set; }
+
+        public bool LeftRookMoved { private get; set; }
+
+        public bool RightRookMoved { private get; set; }
+
         public bool CanLeftCastle
         {
             get
             {
-                if (KingMoved) { return false; }
-                if (LeftRookMoved) { return false; }
-                var p1 = GameBoard.GetPanel(BaseRow, 1);
-                var p2 = GameBoard.GetPanel(BaseRow, 2);
-                if (p1.IsPiece || p2.IsPiece) { return false; }
-                var opponentMoves = King.GetOpponentPanels();
+                if (this.KingMoved)
+                {
+                    return false;
+                }
+
+                if (this.LeftRookMoved)
+                {
+                    return false;
+                }
+
+                var p1 = this.GameBoard.GetPanel(this.BaseRow, 1);
+                var p2 = this.GameBoard.GetPanel(this.BaseRow, 2);
+                if (p1.IsPiece || p2.IsPiece)
+                {
+                    return false;
+                }
+
+                var opponentMoves = this.King.GetOpponentPanels();
                 return !opponentMoves.Contains(p1) && !opponentMoves.Contains(p2);
             }
         }
+
         public bool CanRightCastle
         {
             get
             {
-                if (KingMoved) { return false; }
-                if (RightRookMoved) { return false; }
-                var p1 = GameBoard.GetPanel(BaseRow, 5);
-                var p2 = GameBoard.GetPanel(BaseRow, 6);
-                if (p1.IsPiece || p2.IsPiece) { return false; }
-                var opponentMoves = King.GetOpponentPanels();
+                if (this.KingMoved)
+                {
+                    return false;
+                }
+
+                if (this.RightRookMoved)
+                {
+                    return false;
+                }
+
+                var p1 = this.GameBoard.GetPanel(this.BaseRow, 5);
+                var p2 = this.GameBoard.GetPanel(this.BaseRow, 6);
+                if (p1.IsPiece || p2.IsPiece)
+                {
+                    return false;
+                }
+
+                var opponentMoves = this.King.GetOpponentPanels();
                 return !opponentMoves.Contains(p1) && !opponentMoves.Contains(p2);
             }
         }
 
-        public Player(string name, Color color, Game game)
+        private Game Game { get; }
+
+        private King King => (from p in this.Pieces where p.Name == "King" select p as King).FirstOrDefault();
+
+        // ReSharper disable once MissingSuppressionJustification
+        // ReSharper disable once StyleCop.SA1404
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public void PlacePieces()
         {
-            Game = game;
-            Name = name;
-            Color = color;
-            GameBoard = game.GameBoard;
-            KingMoved = false;
-            LeftRookMoved = false;
-            RightRookMoved = false;
+            if (this.Color == Color.White)
+            {
+                new Rook(this.GameBoard, new Coordinates(7, 0), this.Color);
+                new Knight(this.GameBoard, new Coordinates(7, 1), this.Color);
+                new Bishop(this.GameBoard, new Coordinates(7, 2), this.Color);
+                new Queen(this.GameBoard, new Coordinates(7, 3), this.Color);
+                new King(this.GameBoard, new Coordinates(7, 4), this.Color);
+                new Bishop(this.GameBoard, new Coordinates(7, 5), this.Color);
+                new Knight(this.GameBoard, new Coordinates(7, 6), this.Color);
+                new Rook(this.GameBoard, new Coordinates(7, 7), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(6, 0), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(6, 1), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(6, 2), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(6, 3), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(6, 4), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(6, 5), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(6, 6), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(6, 7), this.Color);
+            }
+            else
+            {
+                new Rook(this.GameBoard, new Coordinates(0, 0), this.Color);
+                new Knight(this.GameBoard, new Coordinates(0, 1), this.Color);
+                new Bishop(this.GameBoard, new Coordinates(0, 2), this.Color);
+                new Queen(this.GameBoard, new Coordinates(0, 3), this.Color);
+                new King(this.GameBoard, new Coordinates(0, 4), this.Color);
+                new Bishop(this.GameBoard, new Coordinates(0, 5), this.Color);
+                new Knight(this.GameBoard, new Coordinates(0, 6), this.Color);
+                new Rook(this.GameBoard, new Coordinates(0, 7), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(1, 0), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(1, 1), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(1, 2), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(1, 3), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(1, 4), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(1, 5), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(1, 6), this.Color);
+                new Pawn(this.GameBoard, new Coordinates(1, 7), this.Color);
+            }
         }
 
         private Player GetOpponent()
         {
-            if (this == Game.Player1) { return Game.Player2; }
-            if (this == Game.Player2) { return Game.Player1; }
-            throw new Exception("Game is not set properly!");
-        }
+            if (this == this.Game.Player1)
+            {
+                return this.Game.Player2;
+            }
 
-        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
-        public void PlacePieces()
-        {
-            if (Color == Color.White)
+            if (this == this.Game.Player2)
             {
-                new Rook(GameBoard, new Coordinates(7, 0), Color);
-                new Knight(GameBoard, new Coordinates(7, 1), Color);
-                new Bishop(GameBoard, new Coordinates(7, 2), Color);
-                new Queen(GameBoard, new Coordinates(7, 3), Color);
-                new King(GameBoard, new Coordinates(7, 4), Color);
-                new Bishop(GameBoard, new Coordinates(7, 5), Color);
-                new Knight(GameBoard, new Coordinates(7, 6), Color);
-                new Rook(GameBoard, new Coordinates(7, 7), Color);
-                new Pawn(GameBoard, new Coordinates(6, 0), Color);
-                new Pawn(GameBoard, new Coordinates(6, 1), Color);
-                new Pawn(GameBoard, new Coordinates(6, 2), Color);
-                new Pawn(GameBoard, new Coordinates(6, 3), Color);
-                new Pawn(GameBoard, new Coordinates(6, 4), Color);
-                new Pawn(GameBoard, new Coordinates(6, 5), Color);
-                new Pawn(GameBoard, new Coordinates(6, 6), Color);
-                new Pawn(GameBoard, new Coordinates(6, 7), Color);
+                return this.Game.Player1;
             }
-            else
-            {
-                new Rook(GameBoard, new Coordinates(0, 0), Color);
-                new Knight(GameBoard, new Coordinates(0, 1), Color);
-                new Bishop(GameBoard, new Coordinates(0, 2), Color);
-                new Queen(GameBoard, new Coordinates(0, 3), Color);
-                new King(GameBoard, new Coordinates(0, 4), Color);
-                new Bishop(GameBoard, new Coordinates(0, 5), Color);
-                new Knight(GameBoard, new Coordinates(0, 6), Color);
-                new Rook(GameBoard, new Coordinates(0, 7), Color);
-                new Pawn(GameBoard, new Coordinates(1, 0), Color);
-                new Pawn(GameBoard, new Coordinates(1, 1), Color);
-                new Pawn(GameBoard, new Coordinates(1, 2), Color);
-                new Pawn(GameBoard, new Coordinates(1, 3), Color);
-                new Pawn(GameBoard, new Coordinates(1, 4), Color);
-                new Pawn(GameBoard, new Coordinates(1, 5), Color);
-                new Pawn(GameBoard, new Coordinates(1, 6), Color);
-                new Pawn(GameBoard, new Coordinates(1, 7), Color);
-            }
+
+            // ReSharper disable once UnthrowableException
+            throw new Exception("Game is not set properly!");
         }
     }
 }

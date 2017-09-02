@@ -1,22 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+// ReSharper disable StyleCop.SA1600
 
 namespace Chess
 {
     public class Game
     {
-        public GameBoard GameBoard { get; set; }
-        public Player Player1 { get; set; }
-        public Player Player2 { get; set; }
-
         public Game(string player1Name, string player2Name)
         {
-            GameBoard = new GameBoard(this);
-            Player1 = new Player(player1Name, Color.White, this);
-            Player2 = new Player(player2Name, Color.Black, this);
-            Player1.PlacePieces();
-            Player2.PlacePieces();
+            this.GameBoard = new GameBoard(this);
+            this.Player1 = new Player(player1Name, Color.White, this);
+            this.Player2 = new Player(player2Name, Color.Black, this);
+            this.Player1.PlacePieces();
+            this.Player2.PlacePieces();
         }
+
+        public GameBoard GameBoard { get; }
+
+        public Player Player1 { get; }
+
+        public Player Player2 { get; }
     }
 }
