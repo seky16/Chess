@@ -2,7 +2,9 @@
 
 namespace Chess
 {
+    using System;
     using System.Linq;
+    using System.Runtime.CompilerServices;
 
     public class Move
     {
@@ -25,68 +27,9 @@ namespace Chess
         public string Display()
         {
             var output = string.Empty;
-            switch (this.StartCoordinates.Column)
-            {
-                case 0:
-                    output += "A";
-                    break;
-                case 1:
-                    output += "B";
-                    break;
-                case 2:
-                    output += "C";
-                    break;
-                case 3:
-                    output += "D";
-                    break;
-                case 4:
-                    output += "E";
-                    break;
-                case 5:
-                    output += "F";
-                    break;
-                case 6:
-                    output += "G";
-                    break;
-                case 7:
-                    output += "H";
-                    break;
-                default:
-                    throw new InvalidMoveException();
-            }
-
-            output += (8 - this.StartCoordinates.Row) + " -> ";
-            switch (this.EndCoordinates.Column)
-            {
-                case 0:
-                    output += "A";
-                    break;
-                case 1:
-                    output += "B";
-                    break;
-                case 2:
-                    output += "C";
-                    break;
-                case 3:
-                    output += "D";
-                    break;
-                case 4:
-                    output += "E";
-                    break;
-                case 5:
-                    output += "F";
-                    break;
-                case 6:
-                    output += "G";
-                    break;
-                case 7:
-                    output += "H";
-                    break;
-                default:
-                    throw new InvalidMoveException();
-            }
-
-            output += (8 - this.EndCoordinates.Row).ToString();
+            output += this.StartCoordinates.ToSAN();
+            output += " -> ";
+            output += this.EndCoordinates.ToSAN();
             return output;
         }
 
@@ -99,6 +42,7 @@ namespace Chess
 
             var startPiece = this.GameBoard.GetPanel(this.StartCoordinates).Piece;
             startPiece.MoveTo(this.EndCoordinates);
+            this.GameBoard.Game.WhoseMove = this.Player.Opponent;
 
             // checks for castling
             switch (startPiece.Name)
@@ -133,22 +77,72 @@ namespace Chess
             }
 
             // castling
-            if (startPiece.Name == "King" && this.StartCoordinates.Column == 4 && this.EndCoordinates.Column == 2 && this.StartCoordinates.Row == this.Player.BaseRow && this.EndCoordinates.Row == this.Player.BaseRow)
+            // left = queenSide
+            if (startPiece.Name == "King" && this.StartCoordinates.Column == 4 && this.EndCoordinates.Column == 2
+                && this.StartCoordinates.Row == this.Player.BaseRow && this.EndCoordinates.Row == this.Player.BaseRow)
             {
                 var p = this.GameBoard.GetPanel(this.Player.BaseRow, 0);
                 var rook = p?.Piece ?? throw new InvalidMoveException();
                 rook.MoveTo(this.GameBoard.GetPanel(this.Player.BaseRow, 3).Coordinates);
+                this.Player.Castled = true;
             }
 
-            if (startPiece.Name != "King" || this.StartCoordinates.Column != 4 || this.EndCoordinates.Column != 6 || this.StartCoordinates.Row != this.Player.BaseRow || this.EndCoordinates.Row != this.Player.BaseRow)
-            {
-                return;
-            }
-
+            // left = kingSide
+            if (startPiece.Name == "King" && this.StartCoordinates.Column == 4 && this.EndCoordinates.Column == 6
+                && this.StartCoordinates.Row == this.Player.BaseRow && this.EndCoordinates.Row == this.Player.BaseRow)
             {
                 var p = this.GameBoard.GetPanel(this.Player.BaseRow, 7);
                 var rook = p?.Piece ?? throw new InvalidMoveException();
                 rook.MoveTo(this.GameBoard.GetPanel(this.Player.BaseRow, 5).Coordinates);
+                this.Player.Castled = true;
+            }
+
+            // en passant
+            if (startPiece.Name == "Pawn" && this.GameBoard.EnPassantCoordinates != null)
+            {
+                if (this.EndCoordinates.Row == this.GameBoard.EnPassantCoordinates.Row
+                    && this.EndCoordinates.Column == this.GameBoard.EnPassantCoordinates.Column)
+                {
+                    if (this.Player.Color == Color.White)
+                    {
+                        this.GameBoard.GetPanel(this.EndCoordinates.Row + 1, this.EndCoordinates.Column).Piece
+                            ?.Remove();
+                    }
+                    else
+                    {
+                        this.GameBoard.GetPanel(this.EndCoordinates.Row - 1, this.EndCoordinates.Column).Piece
+                            ?.Remove();
+                    }
+                }
+            }
+
+            if (startPiece.Name == "Pawn" && this.StartCoordinates.Row == 6 && this.EndCoordinates.Row == 4)
+            {
+                this.GameBoard.EnPassantCoordinates =
+                    this.GameBoard.GetPanel(this.EndCoordinates.Row + 1, this.EndCoordinates.Column).Coordinates;
+            }
+            else if (startPiece.Name == "Pawn" && this.StartCoordinates.Row == 1 && this.EndCoordinates.Row == 3)
+            {
+                this.GameBoard.EnPassantCoordinates = this.GameBoard
+                    .GetPanel(this.EndCoordinates.Row - 1, this.EndCoordinates.Column).Coordinates;
+            }
+            else
+            {
+                this.GameBoard.EnPassantCoordinates = null;
+            }
+
+            if (this.Player.Color == Color.Black)
+            {
+                this.GameBoard.Game.MoveCount++;
+            }
+
+            if (startPiece.Name == "Pawn" || this.GameBoard.GetPanel(this.EndCoordinates).IsPiece)
+            {
+                this.GameBoard.Game.FiftyMovesCount = 0;
+            }
+            else
+            {
+                this.GameBoard.Game.FiftyMovesCount++;
             }
         }
 
@@ -207,6 +201,11 @@ namespace Chess
 
         private bool IsValid()
         {
+            if (this.Player != this.GameBoard.Game.WhoseMove)
+            {
+                return false;
+            }
+
             if (!this.GameBoard.GetPanel(this.StartCoordinates)?.IsPiece ?? false)
             {
                 return false;

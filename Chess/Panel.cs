@@ -13,7 +13,7 @@ namespace Chess
 
         public bool IsPiece => this.Piece != null;
 
-        public Pieces Piece { get; set; }
+        public Piece Piece { get; set; }
 
         public string ShowPanel()
         {

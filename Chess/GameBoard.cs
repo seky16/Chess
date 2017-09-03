@@ -19,11 +19,38 @@ namespace Chess
                     this.Panels.Add(new Panel(i, j));
                 }
             }
+
+            this.EnPassantCoordinates = null;
+        }
+
+        public GameBoard(string fen)
+        {
+            this.Game = new Game(this);
+            var split = fen.Split(" ");
+            var board = split[0] ?? throw new InvalidFenException(1);
+            var whoseMove = split[1] ?? throw new InvalidFenException(2);
+            var castling = split[2] ?? throw new InvalidFenException(3);
+            // ReSharper disable once StyleCop.SA1305
+            var enPassant = split[3] ?? throw new InvalidFenException(4);
+            var fiftyMoves = split[4] ?? throw new InvalidFenException(5);
+            var movesCount = split[5] ?? throw new InvalidFenException(6);
+
+            if (!int.TryParse(movesCount, out var movesCountResult))
+            {
+                throw new InvalidFenException(6);
+            }
+
+            if (!int.TryParse(fiftyMoves, out var fiftyMovesResult))
+            {
+                throw new InvalidFenException(6);
+            }
         }
 
         public List<Panel> Panels { get; }
 
         public Game Game { get; }
+
+        public Coordinates EnPassantCoordinates { get; set; }
 
         public Panel GetPanel(int row, int col)
         {
@@ -45,6 +72,7 @@ namespace Chess
         {
             var output = new StringBuilder();
             const string Line = " +-+-+-+-+-+-+-+-+";
+            output.AppendLine("  a b c d e f g h");
             output.AppendLine(Line);
             for (var r = 0; r < 8; r++)
             {
@@ -54,13 +82,123 @@ namespace Chess
                     output.Append(this.GetPanel(r, c).ShowPanel());
                     output.Append("|");
                 }
+                output.Append(8 - r);
 
                 output.AppendLine();
                 output.AppendLine(Line);
             }
 
-            output.Append("  A B C D E F G H");
+            output.Append("  a b c d e f g h");
             return output.ToString();
+        }
+
+        // ReSharper disable once InconsistentNaming
+        public string ToFEN()
+        {
+            var output = string.Empty;
+
+            // board
+            var blankSquares = 0;
+            for (var index = 0; index < 64; index++)
+            {
+                if (this.Panels.ElementAt(index).IsPiece)
+                {
+                    var piece = this.Panels.ElementAt(index).Piece;
+                    if (blankSquares > 0)
+                    {
+                        output += blankSquares.ToString();
+                        blankSquares = 0;
+                    }
+
+                    output += piece.Show();
+                }
+                else
+                {
+                    blankSquares++;
+                }
+
+                if (index % 8 != 7)
+                {
+                    continue;
+                }
+
+                if (blankSquares > 0)
+                {
+                    output += blankSquares.ToString();
+                    output += "/";
+                    blankSquares = 0;
+                }
+                else
+                {
+                    if (index > 0 && index != 63)
+                    {
+                        output += "/";
+                    }
+                }
+            }
+
+            // whose move
+            if (this.Game.WhoseMove.Color == Color.White)
+            {
+                output += " w ";
+            }
+            else
+            {
+                output += " b ";
+            }
+
+            // castling
+            var castling = false;
+            if (!this.Game.WhitePlayer.KingMoved && !this.Game.WhitePlayer.RightRookMoved && !this.Game.WhitePlayer.Castled)
+            {
+                output += "K";
+                castling = true;
+            }
+
+            if (!this.Game.WhitePlayer.KingMoved && !this.Game.WhitePlayer.LeftRookMoved && !this.Game.WhitePlayer.Castled)
+            {
+                output += "Q";
+                castling = true;
+            }
+
+            if (!this.Game.WhitePlayer.Opponent.KingMoved && !this.Game.WhitePlayer.Opponent.RightRookMoved && !this.Game.WhitePlayer.Opponent.Castled)
+            {
+                output += "k";
+                castling = true;
+            }
+
+            if (!this.Game.WhitePlayer.Opponent.KingMoved && !this.Game.WhitePlayer.Opponent.LeftRookMoved && !this.Game.WhitePlayer.Opponent.Castled)
+            {
+                output += "q";
+                castling = true;
+            }
+
+            if (castling)
+            {
+                output += " ";
+            }
+            else
+            {
+                output += "- ";
+            }
+
+            // enpassant
+            if (this.EnPassantCoordinates == null)
+            {
+                output += "- ";
+            }
+            else
+            {
+                output += $"{this.EnPassantCoordinates.ToSAN()} ";
+            }
+
+            // 50 moves
+            output += $"{this.Game.FiftyMovesCount} ";
+
+            // moves
+            output += this.Game.MoveCount;
+
+            return output;
         }
     }
 }

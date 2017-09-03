@@ -18,13 +18,14 @@ namespace Chess
             this.KingMoved = false;
             this.LeftRookMoved = false;
             this.RightRookMoved = false;
+            this.Castled = false;
         }
 
         public string Name { get; }
 
         public Color Color { get; }
 
-        public List<Pieces> Pieces =>
+        public List<Piece> Pieces =>
             (from pan in this.GameBoard.Panels where pan.IsPiece where pan.Piece.Color == this.Color select pan.Piece).ToList();
 
         public GameBoard GameBoard { get; }
@@ -61,11 +62,13 @@ namespace Chess
             }
         }
 
-        public bool KingMoved { private get; set; }
+        public bool KingMoved { get; set; }
 
-        public bool LeftRookMoved { private get; set; }
+        public bool LeftRookMoved { get; set; }
 
-        public bool RightRookMoved { private get; set; }
+        public bool RightRookMoved { get; set; }
+
+        public bool Castled { get; set; }
 
         public bool CanLeftCastle
         {
