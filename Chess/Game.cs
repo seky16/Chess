@@ -2,8 +2,6 @@
 
 namespace Chess
 {
-    using System.Runtime.CompilerServices;
-
     public class Game
     {
         public Game(string player1Name, string player2Name)
@@ -44,6 +42,8 @@ namespace Chess
         public Player WhoseMove { get; set; }
 
         public Player WhitePlayer => this.Player1.Color == Color.White ? this.Player1 : this.Player2;
+
+        public Player BlackPlayer => this.Player1.Color == Color.Black ? this.Player1 : this.Player2;
 
         public int MoveCount { get; set; }
 

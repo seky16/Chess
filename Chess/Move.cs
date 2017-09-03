@@ -2,9 +2,7 @@
 
 namespace Chess
 {
-    using System;
     using System.Linq;
-    using System.Runtime.CompilerServices;
 
     public class Move
     {
@@ -12,8 +10,8 @@ namespace Chess
         {
             this.Player = player;
             this.GameBoard = this.Player.GameBoard;
-            this.StartCoordinates = ParseCoords(start);
-            this.EndCoordinates = ParseCoords(end);
+            this.StartCoordinates = Coordinates.FromString(start);
+            this.EndCoordinates = Coordinates.FromString(end);
         }
 
         private Coordinates StartCoordinates { get; }
@@ -144,59 +142,6 @@ namespace Chess
             {
                 this.GameBoard.Game.FiftyMovesCount++;
             }
-        }
-
-        private static Coordinates ParseCoords(string coords)
-        {
-            if (coords.Length != 2)
-            {
-                throw new InvalidMoveException();
-            }
-
-            if (!int.TryParse(coords[1].ToString(), out var row))
-            {
-                throw new InvalidMoveException();
-            }
-
-            row = 8 - row;
-            if (!(row >= 0 && row < 8))
-            {
-                throw new InvalidMoveException();
-            }
-
-            int column;
-            var columnChar = coords.ToUpper()[0];
-            switch (columnChar)
-            {
-                case 'A':
-                    column = 0;
-                    break;
-                case 'B':
-                    column = 1;
-                    break;
-                case 'C':
-                    column = 2;
-                    break;
-                case 'D':
-                    column = 3;
-                    break;
-                case 'E':
-                    column = 4;
-                    break;
-                case 'F':
-                    column = 5;
-                    break;
-                case 'G':
-                    column = 6;
-                    break;
-                case 'H':
-                    column = 7;
-                    break;
-                default:
-                    throw new InvalidMoveException();
-            }
-
-            return new Coordinates(row, column);
         }
 
         private bool IsValid()

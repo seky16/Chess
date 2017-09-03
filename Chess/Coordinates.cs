@@ -2,7 +2,6 @@
 
 namespace Chess
 {
-    // todo: consider making this static, move parsing coordinates here from move.cs
     public class Coordinates
     {
         public Coordinates(int row, int column)
@@ -16,6 +15,59 @@ namespace Chess
         public int Column { get; }
 
         public bool Valid => (this.Row >= 0 && this.Row < 8) && (this.Column >= 0 && this.Column < 8);
+
+        public static Coordinates FromString(string coords)
+        {
+            if (coords.Length != 2)
+            {
+                throw new InvalidCoordsException();
+            }
+
+            if (!int.TryParse(coords[1].ToString(), out var row))
+            {
+                throw new InvalidCoordsException();
+            }
+
+            row = 8 - row;
+            if (!(row >= 0 && row < 8))
+            {
+                throw new InvalidCoordsException();
+            }
+
+            int column;
+            var columnChar = coords.ToUpper()[0];
+            switch (columnChar)
+            {
+                case 'A':
+                    column = 0;
+                    break;
+                case 'B':
+                    column = 1;
+                    break;
+                case 'C':
+                    column = 2;
+                    break;
+                case 'D':
+                    column = 3;
+                    break;
+                case 'E':
+                    column = 4;
+                    break;
+                case 'F':
+                    column = 5;
+                    break;
+                case 'G':
+                    column = 6;
+                    break;
+                case 'H':
+                    column = 7;
+                    break;
+                default:
+                    throw new InvalidCoordsException();
+            }
+
+            return new Coordinates(row, column);
+        }
 
         // ReSharper disable once InconsistentNaming
         public string ToSAN()

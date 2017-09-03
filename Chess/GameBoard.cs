@@ -23,6 +23,7 @@ namespace Chess
             this.EnPassantCoordinates = null;
         }
 
+        // ReSharper disable StyleCop.SA1305
         public GameBoard(string fen)
         {
             this.Game = new Game(this);
@@ -30,20 +31,27 @@ namespace Chess
             var board = split[0] ?? throw new InvalidFenException(1);
             var whoseMove = split[1] ?? throw new InvalidFenException(2);
             var castling = split[2] ?? throw new InvalidFenException(3);
-            // ReSharper disable once StyleCop.SA1305
             var enPassant = split[3] ?? throw new InvalidFenException(4);
             var fiftyMoves = split[4] ?? throw new InvalidFenException(5);
-            var movesCount = split[5] ?? throw new InvalidFenException(6);
+            var moveCount = split[5] ?? throw new InvalidFenException(6);
 
-            if (!int.TryParse(movesCount, out var movesCountResult))
+            if (!int.TryParse(moveCount, out var moveCountResult))
             {
                 throw new InvalidFenException(6);
             }
+
+            this.Game.MoveCount = moveCountResult;
 
             if (!int.TryParse(fiftyMoves, out var fiftyMovesResult))
             {
-                throw new InvalidFenException(6);
+                throw new InvalidFenException(5);
             }
+
+            this.Game.FiftyMovesCount = fiftyMovesResult;
+
+            var enPassantCoordinates = Coordinates.FromString(enPassant);
+
+            this.EnPassantCoordinates = enPassantCoordinates;
 
             if (castling.Contains("k"))
             {
@@ -71,6 +79,31 @@ namespace Chess
                 this.Game.WhitePlayer.KingMoved = false;
                 this.Game.WhitePlayer.LeftRookMoved = false;
                 this.Game.WhitePlayer.Castled = false;
+            }
+
+            const string Possible = "kqKQ-";
+            if (!castling.Any(ch => Possible.Contains(ch)))
+            {
+                throw new InvalidFenException(3);
+            }
+
+            switch (whoseMove.ToLower())
+            {
+                case "w":
+                    this.Game.WhoseMove = this.Game.WhitePlayer;
+                    break;
+                case "b":
+                    this.Game.WhoseMove = this.Game.BlackPlayer;
+                    break;
+                default:
+                    throw new InvalidFenException(2);
+            }
+
+            var rows = board.Split("/");
+            for (var r = 0; r < 8; r++)
+            {
+                var row = rows[r] ?? throw new InvalidFenException(1);
+
             }
         }
 
@@ -110,6 +143,7 @@ namespace Chess
                     output.Append(this.GetPanel(r, c).ShowPanel());
                     output.Append("|");
                 }
+
                 output.Append(8 - r);
 
                 output.AppendLine();
