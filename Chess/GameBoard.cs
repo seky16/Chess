@@ -55,16 +55,16 @@ namespace Chess
 
             if (castling.Contains("k"))
             {
-                this.Game.WhitePlayer.Opponent.KingMoved = false;
-                this.Game.WhitePlayer.Opponent.RightRookMoved = false;
-                this.Game.WhitePlayer.Opponent.Castled = false;
+                this.Game.BlackPlayer.KingMoved = false;
+                this.Game.BlackPlayer.RightRookMoved = false;
+                this.Game.BlackPlayer.Castled = false;
             }
 
             if (castling.Contains("q"))
             {
-                this.Game.WhitePlayer.Opponent.KingMoved = false;
-                this.Game.WhitePlayer.Opponent.LeftRookMoved = false;
-                this.Game.WhitePlayer.Opponent.Castled = false;
+                this.Game.BlackPlayer.KingMoved = false;
+                this.Game.BlackPlayer.LeftRookMoved = false;
+                this.Game.BlackPlayer.Castled = false;
             }
 
             if (castling.Contains("K"))
@@ -223,13 +223,13 @@ namespace Chess
                 castling = true;
             }
 
-            if (!this.Game.WhitePlayer.Opponent.KingMoved && !this.Game.WhitePlayer.Opponent.RightRookMoved && !this.Game.WhitePlayer.Opponent.Castled)
+            if (!this.Game.BlackPlayer.KingMoved && !this.Game.BlackPlayer.RightRookMoved && !this.Game.BlackPlayer.Castled)
             {
                 output += "k";
                 castling = true;
             }
 
-            if (!this.Game.WhitePlayer.Opponent.KingMoved && !this.Game.WhitePlayer.Opponent.LeftRookMoved && !this.Game.WhitePlayer.Opponent.Castled)
+            if (!this.Game.BlackPlayer.KingMoved && !this.Game.BlackPlayer.LeftRookMoved && !this.Game.BlackPlayer.Castled)
             {
                 output += "q";
                 castling = true;
