@@ -1,7 +1,8 @@
-﻿// ReSharper disable StyleCop.SA1600
+// ReSharper disable StyleCop.SA1600
 
 namespace Chess
 {
+    // todo: consider making this static, move parsing coordinates here from move.cs
     public class Coordinates
     {
         public Coordinates(int row, int column)

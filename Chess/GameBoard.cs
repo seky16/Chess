@@ -44,6 +44,34 @@ namespace Chess
             {
                 throw new InvalidFenException(6);
             }
+
+            if (castling.Contains("k"))
+            {
+                this.Game.WhitePlayer.Opponent.KingMoved = false;
+                this.Game.WhitePlayer.Opponent.RightRookMoved = false;
+                this.Game.WhitePlayer.Opponent.Castled = false;
+            }
+
+            if (castling.Contains("q"))
+            {
+                this.Game.WhitePlayer.Opponent.KingMoved = false;
+                this.Game.WhitePlayer.Opponent.LeftRookMoved = false;
+                this.Game.WhitePlayer.Opponent.Castled = false;
+            }
+
+            if (castling.Contains("K"))
+            {
+                this.Game.WhitePlayer.KingMoved = false;
+                this.Game.WhitePlayer.RightRookMoved = false;
+                this.Game.WhitePlayer.Castled = false;
+            }
+
+            if (castling.Contains("Q"))
+            {
+                this.Game.WhitePlayer.KingMoved = false;
+                this.Game.WhitePlayer.LeftRookMoved = false;
+                this.Game.WhitePlayer.Castled = false;
+            }
         }
 
         public List<Panel> Panels { get; }

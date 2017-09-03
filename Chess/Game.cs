@@ -23,6 +23,16 @@ namespace Chess
             this.GameBoard = board;
             this.Player1 = new Player("White", Color.White, this);
             this.Player2 = new Player("Black", Color.Black, this);
+
+            this.Player1.Castled = true;
+            this.Player1.KingMoved = true;
+            this.Player1.LeftRookMoved = true;
+            this.Player1.RightRookMoved = true;
+
+            this.Player2.Castled = true;
+            this.Player2.KingMoved = true;
+            this.Player2.LeftRookMoved = true;
+            this.Player2.RightRookMoved = true;
         }
 
         public GameBoard GameBoard { get; }
