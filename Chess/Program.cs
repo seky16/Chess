@@ -8,7 +8,7 @@ namespace Chess
     {
         private static void Main()
         {
-            var game = new Game("Player1", "Player2");
+            /*var game = new Game("Player1", "Player2");
             var board = game.GameBoard;
             var player1 = game.Player1;
             var player2 = game.Player2;
@@ -46,7 +46,17 @@ namespace Chess
                 Console.WriteLine(board.ToFEN());
                 Console.WriteLine();
                 Console.WriteLine($"{player2.Name}: {player2Move.Display()}");
-            }
+            }*/
+            var fen = Console.ReadLine();
+            var board = new GameBoard(fen);
+            var input1 = Console.ReadLine();
+            var input2 = Console.ReadLine();
+            var player1Move = new Move(input1, input2, board.Game.Player1);
+            Console.WriteLine(board.Output());
+            player1Move.Make();
+            Console.ReadLine();
+            Console.WriteLine(board.Output());
+            Console.ReadLine();
         }
     }
 }

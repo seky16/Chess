@@ -27,6 +27,17 @@ namespace Chess
         public GameBoard(string fen)
         {
             this.Game = new Game(this);
+            this.Panels = new List<Panel>();
+            for (var i = 0; i < 8; i++)
+            {
+                for (var j = 0; j < 8; j++)
+                {
+                    this.Panels.Add(new Panel(i, j));
+                }
+            }
+
+            this.EnPassantCoordinates = null;
+
             var split = fen.Split(" ");
             var board = split[0] ?? throw new InvalidFenException(1);
             var whoseMove = split[1] ?? throw new InvalidFenException(2);
@@ -49,7 +60,11 @@ namespace Chess
 
             this.Game.FiftyMovesCount = fiftyMovesResult;
 
-            var enPassantCoordinates = Coordinates.FromString(enPassant);
+            Coordinates enPassantCoordinates = null;
+            if (enPassant != "-")
+            {
+                enPassantCoordinates = Coordinates.FromString(enPassant);
+            }
 
             this.EnPassantCoordinates = enPassantCoordinates;
 
@@ -99,11 +114,161 @@ namespace Chess
                     throw new InvalidFenException(2);
             }
 
-            var rows = board.Split("/");
-            for (var r = 0; r < 8; r++)
+            var index = 0;
+            foreach (var c in board)
             {
-                var row = rows[r] ?? throw new InvalidFenException(1);
+                if (index >= 64)
+                {
+                    continue;
+                }
 
+                switch (c)
+                {
+                    case '1':
+                        if (index < 63)
+                        {
+                            index++;
+                        }
+
+                        break;
+                    case '2':
+                        if (index < 62)
+                        {
+                            index += 2;
+                        }
+
+                        break;
+                    case '3':
+                        if (index < 61)
+                        {
+                            index += 3;
+                        }
+
+                        break;
+                    case '4':
+                        if (index < 60)
+                        {
+                            index += 4;
+                        }
+
+                        break;
+                    case '5':
+                        if (index < 59)
+                        {
+                            index += 5;
+                        }
+
+                        break;
+                    case '6':
+                        if (index < 58)
+                        {
+                            index += 6;
+                        }
+
+                        break;
+                    case '7':
+                        if (index < 57)
+                        {
+                            index += 7;
+                        }
+
+                        break;
+                    case '8':
+                        if (index < 56)
+                        {
+                            index += 8;
+                        }
+
+                        break;
+                    case 'P':
+                        this.Panels.ElementAt(index).Piece = new Pawn(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.White);
+                        index++;
+                        break;
+                    case 'N':
+                        this.Panels.ElementAt(index).Piece = new Knight(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.White);
+                        index++;
+                        break;
+                    case 'B':
+                        this.Panels.ElementAt(index).Piece = new Bishop(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.White);
+                        index++;
+                        break;
+                    case 'R':
+                        this.Panels.ElementAt(index).Piece = new Rook(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.White);
+                        index++;
+                        break;
+                    case 'Q':
+                        this.Panels.ElementAt(index).Piece = new Queen(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.White);
+                        index++;
+                        break;
+                    case 'K':
+                        this.Panels.ElementAt(index).Piece = new King(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.White);
+                        index++;
+                        break;
+                    case 'p':
+                        this.Panels.ElementAt(index).Piece = new Pawn(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.Black);
+                        index++;
+                        break;
+                    case 'n':
+                        this.Panels.ElementAt(index).Piece = new Knight(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.Black);
+                        index++;
+                        break;
+                    case 'b':
+                        this.Panels.ElementAt(index).Piece = new Bishop(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.Black);
+                        index++;
+                        break;
+                    case 'r':
+                        this.Panels.ElementAt(index).Piece = new Rook(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.Black);
+                        index++;
+                        break;
+                    case 'q':
+                        this.Panels.ElementAt(index).Piece = new Queen(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.Black);
+                        index++;
+                        break;
+                    case 'k':
+                        this.Panels.ElementAt(index).Piece = new King(
+                            this,
+                            this.Panels.ElementAt(index).Coordinates,
+                            Color.Black);
+                        index++;
+                        break;
+                    case '/':
+                        continue;
+                    default:
+                        throw new InvalidFenException(1);
+                }
             }
         }
 
